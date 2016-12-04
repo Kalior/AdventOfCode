@@ -5,6 +5,7 @@ import (
   "io/ioutil"
   "strings"
   "strconv"
+  "sort"
 )
 
 func main() {
@@ -29,7 +30,6 @@ func main() {
       side, err := strconv.Atoi(strings.Trim(triangle[j], " "))
       if err != nil {
         fmt.Println(err)
-
       }
       triangleArray[j] = side
     }
@@ -56,13 +56,8 @@ func countPossibleTriangles(triangles [][3]int) int {
 }
 
 func testTriange(triangle [3]int) int {
-  if triangle[0] >= triangle[1] && triangle[0] >= triangle[2] {
-    return compareSides(triangle[0], triangle[1], triangle[2])
-  } else if triangle[1] >= triangle[0] && triangle[1] >= triangle[2] {
-    return compareSides(triangle[1], triangle[0], triangle[2])
-  } else {
-    return compareSides(triangle[2], triangle[1], triangle[0])
-  }
+  sort.Ints(triangle[:])
+  return compareSides(triangle[0], triangle[1], triangle[2])
 }
 
 func compareSides(largestSide int, side1 int, side2 int) int {
