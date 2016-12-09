@@ -5,7 +5,7 @@ import (
   "strings"
   "io/ioutil"
   "strconv"
-  "time"
+  "regexp"
 )
 
 type Instruction interface {
@@ -32,11 +32,13 @@ func main() {
   instructions := parseInput("day8input")
   performInstructions(matrix, instructions)
   fmt.Println(count(matrix))
+  print_matrix(matrix)
 }
 
 func parseInput(filename string) []Instruction {
   day8input, err := ioutil.ReadFile(filename)
   var instructions []Instruction
+  r, _ := regexp.Compile("[0-9]+")
   if err != nil {
     fmt.Println(err)
   } else {
@@ -44,18 +46,18 @@ func parseInput(filename string) []Instruction {
     for i := 0; i < len(day8lines) - 1; i++ {
       line := strings.Split(day8lines[i], " ")
       if line[0] == "rect" {
-        ab := strings.Split(line[1], "x")
+        ab := r.FindAllString(line[1], -1)
         a, _ := strconv.Atoi(ab[0])
         b, _ := strconv.Atoi(ab[1])
         instructions = append(instructions, RectInstruction{a, b})
       } else if line[1] == "row" {
-        astr := strings.Split(line[2], "=")
-        a, _ := strconv.Atoi(astr[1])
+        astr := r.FindString(line[2])
+        a, _ := strconv.Atoi(astr)
         b, _ := strconv.Atoi(line[4])
         instructions = append(instructions, RowInstruction{a, b})
       } else {
-        astr := strings.Split(line[2], "=")
-        a, _ := strconv.Atoi(astr[1])
+        astr := r.FindString(line[2])
+        a, _ := strconv.Atoi(astr)
         b, _ := strconv.Atoi(line[4])
         instructions = append(instructions, ColumnInstruction{a, b})
       }
@@ -67,8 +69,6 @@ func parseInput(filename string) []Instruction {
 func performInstructions(matrix [][]bool, instructions []Instruction) {
   for i := 0; i < len(instructions); i++ {
     instructions[i].performInstruction(matrix)
-    print_matrix(matrix)
-    time.Sleep(100 * time.Millisecond)
   }
 }
 
