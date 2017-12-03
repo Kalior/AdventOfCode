@@ -1,26 +1,23 @@
 package day2
 
-import java.io.File
-import java.io.InputStream
 import kotlin.system.measureTimeMillis
 
 fun main(args : Array<String>) {
-    val mil = measureTimeMillis { solve() }
+    val mil = measureTimeMillis {
+        val input = parse()
+        solve(input)
+    }
     println(mil)
 }
 
-fun solve() : Unit {
-    val inputStream: InputStream = File("input/day2input").inputStream()
-    val lineList = mutableListOf<String>()
+fun parse() : List<List<Double>> {
+    val parser = util.Parser("2")
+    val lines = parser.getLines()
+    val input = parser.getNumbersFromLines(lines)
+    return input
+}
 
-    inputStream.bufferedReader().useLines { lines -> lines.forEach { lineList.add(it) } }
-
-    val floatRegex = "([+|-]?\\d+\\.?\\d*)".toRegex()
-
-    val input = lineList.map { line ->
-        floatRegex.findAll(line).map { it.groupValues[0].toDouble() }.toList()
-    }
-
+fun solve(input: List<List<Double>>) : Unit {
     val checksum = input.sumByDouble { rowDiff(it) }
 
     val betterChecksum = input.sumByDouble { rowDiv(it) }
