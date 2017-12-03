@@ -27,9 +27,9 @@ fun solve2(input: String) : Unit {
     var y = 4
     var level = 1
     var addedInLevel = 0
-    while (true) {
-        var next = 0
-        next += grid[x-1][y]
+    var next = 0
+    while (next < inputNbr) {
+        next = grid[x-1][y]
         next += grid[x-1][y-1]
         next += grid[x-1][y+1]
 
@@ -62,12 +62,8 @@ fun solve2(input: String) : Unit {
             level++
             x++
         }
-
-        if (next > inputNbr) {
-            println(next)
-            break
-        }
     }
+    println(next)
     grid.forEach {
         print(">")
         it.forEach { print(" ${it} ") }
@@ -81,22 +77,14 @@ fun solve1(input: String) : Unit {
     var counter = 1
     var level = 0
 
-    while (true) {
+    while (counter < inputNbr) {
         counter += 8 * (level + 1)
         level++
-
-        if (counter > inputNbr) {
-            break
-        }
     }
 
     var steps = 0
     var at = inputNbr
-    while (true) {
-        if (level == 0) {
-            break
-        }
-
+    while (level != 0) {
         val pos = counter - at
         val sideLength = level * 2
         val corr: Int = pos / sideLength
@@ -117,6 +105,4 @@ fun solve1(input: String) : Unit {
         level--
     }
     println(steps)
-
-
 }
