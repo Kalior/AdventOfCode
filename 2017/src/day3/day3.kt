@@ -78,8 +78,8 @@ fun solve1(input: String) : Unit {
     var level = 0
 
     while (counter < inputNbr) {
-        counter += 8 * (level + 1)
         level++
+        counter += 8 * level
     }
 
     var steps = 0
