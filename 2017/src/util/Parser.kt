@@ -13,7 +13,7 @@ class Parser(val day: String) {
     }
 
     fun getNumbersFromLines(input: List<String>): List<List<Double>> {
-        val floatRegex = "([+|-]?\\d+\\.?\\d*)".toRegex()
+        val floatRegex = "([+-]?\\d+\\.?\\d*)".toRegex()
         val matches = getFromLines(floatRegex, input)
 
         val numbers = matches.map { line -> line.map { it[0].toDouble() } }
