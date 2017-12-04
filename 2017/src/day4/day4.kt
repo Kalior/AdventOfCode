@@ -26,34 +26,13 @@ fun validPhrase2(phrase: String) : Boolean {
     val words = phrase.split(" ")
     val wordSet = mutableSetOf<String>()
     words.forEach { word ->
-        if (wordSet.contains(word) || wordSet.any { isAnagram(word, it) }) {
+        val sorted = word.toSortedSet().toList().toString()
+        if (wordSet.contains(sorted)) {
             return false
         } else {
-            wordSet.add(word)
+            wordSet.add(sorted)
         }
     }
-    return true
-}
-
-fun isAnagram(s1: String, s2: String) : Boolean {
-    val wordMap = mutableMapOf<Char, Int>()
-    s1.forEach {
-        var v = wordMap[it] ?: 0
-        v++
-        wordMap.put(it, v)
-    }
-    s2.forEach {
-        var v = wordMap[it] ?: 0
-        v--
-        wordMap.put(it, v)
-    }
-
-    wordMap.forEach { entry ->
-        if (entry.value != 0) {
-            return false
-        }
-    }
-
     return true
 }
 
