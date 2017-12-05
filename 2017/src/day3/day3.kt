@@ -2,13 +2,17 @@ package day3
 
 import kotlin.system.measureTimeMillis
 
+data class Coordinate(val x: Int, val y: Int)
+
 fun main(args : Array<String>) {
     val mil = measureTimeMillis {
         val input = parse()
-        solve1(input)
-        solve2(input)
+        val sol1 = solve1(input)
+        val sol2 = solve2(input)
+        println("Solution 1: ${sol1}")
+        println("Solution 2: ${sol2}")
     }
-    println(mil)
+    println("Time: ${mil} (ms)")
 }
 
 fun parse() : String {
@@ -17,30 +21,30 @@ fun parse() : String {
     return lines[0]
 }
 
-fun solve2(input: String) : Unit {
+fun solve2(input: String) : Int {
     val inputNbr = input.toInt()
 
-    var grid = Array(10, {intArrayOf(0,0,0,0,0,0,0,0,0,0)})
+    val grid = mutableMapOf<Coordinate, Int>()
+    grid[Coordinate(4, 4)] = 1
 
-    grid[4][4] = 1
     var x = 5
     var y = 4
     var level = 1
     var addedInLevel = 0
     var next = 0
     while (next < inputNbr) {
-        next = grid[x-1][y]
-        next += grid[x-1][y-1]
-        next += grid[x-1][y+1]
+        next = grid[Coordinate(x-1, y)] ?: 0
+        next += grid[Coordinate(x-1, y-1)] ?: 0
+        next += grid[Coordinate(x-1, y+1)] ?: 0
 
-        next += grid[x+1][y]
-        next += grid[x+1][y-1]
-        next += grid[x+1][y+1]
+        next += grid[Coordinate(x+1, y)] ?: 0
+        next += grid[Coordinate(x+1, y-1)] ?: 0
+        next += grid[Coordinate(x+1, y+1)] ?: 0
 
-        next += grid[x][y-1]
-        next += grid[x][y+1]
+        next += grid[Coordinate(x, y-1)] ?: 0
+        next += grid[Coordinate(x, y+1)] ?: 0
 
-        grid[x][y] = next
+        grid[Coordinate(x, y)] = next
 
         addedInLevel++
 
@@ -65,13 +69,12 @@ fun solve2(input: String) : Unit {
     }
     println(next)
     grid.forEach {
-        print(">")
-        it.forEach { print(" ${it} ") }
-        println()
+        println("> ${it.key}: ${it.value}")
     }
+    return next
 }
 
-fun solve1(input: String) : Unit {
+fun solve1(input: String) : Int {
     val inputNbr = input.toInt()
 
     var counter = 1
@@ -105,4 +108,5 @@ fun solve1(input: String) : Unit {
         level--
     }
     println(steps)
+    return steps
 }
