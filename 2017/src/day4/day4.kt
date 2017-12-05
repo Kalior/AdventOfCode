@@ -18,7 +18,7 @@ fun parse() : List<String> {
 }
 
 fun solve2(input: List<String>) : Unit {
-    val n = input.filter { validPhrase2(it) }.size
+    val n = input.filter(::validPhrase2).size
     println(n)
 }
 
@@ -37,7 +37,7 @@ fun validPhrase2(phrase: String) : Boolean {
 }
 
 fun solve1(input: List<String>) : Unit {
-    val n = input.filter { validPhrase(it) }.size
+    val n = input.filter(::validPhrase).size
     println(n)
 }
 
