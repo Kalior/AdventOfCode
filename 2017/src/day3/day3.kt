@@ -24,8 +24,7 @@ fun parse() : String {
 fun solve2(input: String) : Int {
     val inputNbr = input.toInt()
 
-    val grid = mutableMapOf<Coordinate, Int>()
-    grid[Coordinate(4, 4)] = 1
+    val grid = mutableMapOf(Pair(Coordinate(4,4), 1))
 
     var x = 5
     var y = 4
@@ -67,7 +66,6 @@ fun solve2(input: String) : Int {
             x++
         }
     }
-    println(next)
     grid.forEach {
         println("> ${it.key}: ${it.value}")
     }
@@ -107,6 +105,5 @@ fun solve1(input: String) : Int {
 
         level--
     }
-    println(steps)
     return steps
 }

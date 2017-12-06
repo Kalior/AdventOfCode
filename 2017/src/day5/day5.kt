@@ -1,6 +1,5 @@
 package day5
 
-import sun.security.util.Length
 import kotlin.system.measureTimeMillis
 
 data class Input(val raw: List<String>, var numbers: List<Int>)
