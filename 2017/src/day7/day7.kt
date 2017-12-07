@@ -46,10 +46,10 @@ fun parseNode(line: String, parser: util.Parser) : Node {
 
 fun solve2(input: Input, root: String) : Int {
     val nodeMap = hashMapOf<String, Node>()
-    input.nodes.map { nodeMap.put(it.name, it) }
+    input.nodes.forEach { nodeMap.put(it.name, it) }
 
     val weightMap = hashMapOf<String, Int>()
-    input.nodes.map { weightMap.put(it.name, calcWeight(nodeMap, it.name)) }
+    input.nodes.forEach { weightMap.put(it.name, calcWeight(nodeMap, it.name)) }
 
     val weight = findImbalance(nodeMap, weightMap, root)
 
