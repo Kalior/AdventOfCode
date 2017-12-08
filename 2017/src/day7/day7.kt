@@ -1,6 +1,5 @@
 package day7
 
-import com.sun.org.apache.xpath.internal.operations.Bool
 import java.util.*
 import kotlin.system.measureTimeMillis
 
@@ -31,6 +30,7 @@ fun parse() : Input {
 fun parseNode(line: String, parser: util.Parser) : Node {
     val nbrRegex = "(\\d+)".toRegex()
     val namesRegex = "([a-zA-Z]+)\\s?".toRegex()
+
     val weights = parser.getAllMatchesFromString(nbrRegex, line)
     val weight = weights[0][0].toInt()
     val names = parser.getAllMatchesFromString(namesRegex, line)
@@ -38,7 +38,7 @@ fun parseNode(line: String, parser: util.Parser) : Node {
     val nameList = mutableListOf<String>()
     val name: String = names[0][0].trim()
 
-    names.map { nameList.add(it[0].trim()) }
+    names.forEach { nameList.add(it[0].trim()) }
     nameList.removeAt(0)
 
     return Node(weight, nameList, name)
