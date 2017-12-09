@@ -29,7 +29,7 @@ fun parse() : Input {
 
 fun parseInstruction(line: String, parser: util.Parser): Instruction {
     val nbrRegex = "(-?\\d+)".toRegex()
-    val namesRegex = "([a-zA-Z]+)\\s?".toRegex()
+    val namesRegex = "([a-zA-Z]+)".toRegex()
     val condRegex = "([<=!>]+)".toRegex()
 
     val ints = parser.getAllMatchesFromString(nbrRegex, line)
