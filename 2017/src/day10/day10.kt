@@ -4,6 +4,15 @@ import kotlin.system.measureTimeMillis
 
 data class Input(val raw: String, val numbers: List<Int>, val ascii: List<Int>)
 
+fun Int.toHexString(): String {
+    val hex =  java.lang.Integer.toHexString(this)
+    return if (hex.length != 2) {
+        "0" + hex
+    } else {
+        hex
+    }
+}
+
 fun main(args : Array<String>) {
     val mil = measureTimeMillis {
         val input = parse()
@@ -48,21 +57,12 @@ fun solve2(input: Input) : String {
 
 fun calcDenseHash(sparseHash: List<Int>): List<Int> {
     return sparseHash
-            .withIndex()
-            .groupBy { it.index / 16 }
-            .map { it.value.fold(0) {acc, item -> acc xor item.value } }
+            .chunked(16)
+            .map { it.reduce {acc, item -> acc xor item} }
 }
 
 fun denseToHex(denseHash: List<Int>): String {
-    val hex = denseHash.map { java.lang.Integer.toHexString(it) }
-            .map {
-                if (it.length != 2) {
-                   "0" + it
-                } else {
-                    it
-                }
-            }
-    return hex.joinToString("")
+    return denseHash.joinToString("", transform = Int::toHexString)
 }
 
 fun solve1(input: Input) : String {
@@ -92,7 +92,7 @@ fun round(initPosition: Int, initSkipLength: Int, lengths: List<Int>, list: Muta
 
 fun getSubList(list: List<Int>, length: Int, position: Int) : List<Int> {
     val listLength = list.size
-    val subList = (0..length-1).map { list[(position + it) % listLength] }
+    val subList = (0 until length).map { list[(position + it) % listLength] }
 
     return subList.asReversed()
 }
@@ -100,7 +100,7 @@ fun getSubList(list: List<Int>, length: Int, position: Int) : List<Int> {
 fun insertSubList(list: MutableList<Int>, subList: List<Int>, position: Int) : MutableList<Int> {
     val listLength = list.size
 
-    for (i in (0..subList.size-1)) {
+    for (i in (0 until subList.size)) {
         list[(position + i) % listLength] = subList[i]
     }
 
