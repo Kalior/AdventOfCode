@@ -24,13 +24,13 @@ fun parse() : Input {
 
 
 fun solve2(input: Input) : String {
-    val (endIndex, score, garbage) = readGroup(input.raw, 1, 1)
+    val (_, _, garbage) = readGroup(input.raw, 1, 1)
 
     return garbage.toString()
 }
 
 fun solve1(input: Input) : String {
-    val (endIndex, score, garbage) = readGroup(input.raw, 1, 1)
+    val (_, score, _) = readGroup(input.raw, 1, 1)
     return score.toString()
 }
 

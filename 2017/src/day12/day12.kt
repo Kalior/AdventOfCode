@@ -87,11 +87,3 @@ fun getGroup(start: Int, connections: HashMap<Int, List<Int>>): List<Int> {
     }
     return reachable.toList()
 }
-
-
-
-
-
-
-
-

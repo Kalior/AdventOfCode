@@ -102,9 +102,7 @@ fun solve1(input: Input) : String {
     val nodeMap = hashMapOf<String, Node>()
     input.nodes.map { nodeMap.put(it.name, it) }
 
-    val root = goUp(nodeMap, input.nodes[0].name)
-
-    return root
+    return goUp(nodeMap, input.nodes[0].name)
 }
 
 fun goUp(nodeMap: HashMap<String, Node>, current: String): String {
