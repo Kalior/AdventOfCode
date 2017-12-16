@@ -40,11 +40,15 @@ fun parse() : Input {
 
 
 fun solve2(input: Input) : String {
+    return calcKnotHash(input.ascii)
+}
+
+fun calcKnotHash(lengths: List<Int>) : String {
     var position = 0
     var skipLength = 0
     val list = (0..255).toMutableList()
     for (i in (0..63)) {
-        val (newPos, newSkip) = round(position, skipLength, input.ascii, list)
+        val (newPos, newSkip) = round(position, skipLength, lengths, list)
         position = newPos
         skipLength = newSkip
     }
