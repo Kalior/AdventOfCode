@@ -22,9 +22,9 @@ fun parse() : Input {
 
     val parsedMoves = moves.map {
         when (it[0]) {
-            's' -> parseSpin(it)
-            'x' -> parseExchange(it)
-            'p' -> parsePartner(it)
+            's' -> Spin.parse(it)
+            'x' -> Exchange.parse(it)
+            'p' -> Partner.parse(it)
             else -> Spin(0)
         }
     }

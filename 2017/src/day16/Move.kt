@@ -12,6 +12,13 @@ data class Spin(private val amount: Int) : Move {
             programs[(i + amount) % length] = c
         }
     }
+
+    companion object {
+        fun parse(move: String): Spin {
+            val times = move.slice((1 until move.length)).toInt()
+            return Spin(times)
+        }
+    }
 }
 
 data class Exchange(private val firstPosition: Int, private val secondPosition: Int) : Move {
@@ -21,6 +28,16 @@ data class Exchange(private val firstPosition: Int, private val secondPosition: 
 
         programs[secondPosition] = firstProgram
         programs[firstPosition] = secondProgram
+    }
+
+    companion object {
+        fun parse(move: String): Exchange {
+            val involved = move.slice((1 until move.length)).split("/")
+            val firstPos = involved[0].toInt()
+            val secondPos = involved[1].toInt()
+
+            return Exchange(firstPos, secondPos)
+        }
     }
 }
 
@@ -36,25 +53,14 @@ data class Partner(private val firstProgram: Char, private val secondProgram: Ch
         programs[secondPosition] = firstProgram
         programs[firstPosition] = secondProgram
     }
-}
 
-fun parseSpin(move: String): Spin {
-    val times = move.slice((1 until move.length)).toInt()
-    return Spin(times)
-}
+    companion object {
+        fun parse(move: String): Partner {
+            val involved = move.slice((1 until move.length)).split("/")
+            val firstProgram = involved[0].toCharArray()[0]
+            val secondProgram = involved[1].toCharArray()[0]
 
-fun parseExchange(move: String) : Exchange {
-    val involved = move.slice((1 until move.length)).split("/")
-    val firstPos = involved[0].toInt()
-    val secondPos = involved[1].toInt()
-
-    return Exchange(firstPos, secondPos)
-}
-
-fun parsePartner(move: String): Partner {
-    val involved = move.slice((1 until move.length)).split("/")
-    val firstProgram = involved[0].toCharArray()[0]
-    val secondProgram = involved[1].toCharArray()[0]
-
-    return Partner(firstProgram, secondProgram)
+            return Partner(firstProgram, secondProgram)
+        }
+    }
 }
