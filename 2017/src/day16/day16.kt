@@ -35,12 +35,16 @@ fun parse() : Input {
 fun solve2(input: Input) : String {
     val programs  = mutableListOf('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p')
 
-    val s = programs.joinToString("")
-    for (i in (0 until 1000000000 % 36)) {
+    var cycle = 1
+    val start = programs.joinToString("")
+    input.moves.forEach { it.act(programs) }
+    while (programs.joinToString("") != start) {
         input.moves.forEach { it.act(programs) }
-        if (programs.joinToString("") == s) {
-            println(i)
-        }
+        cycle++
+    }
+
+    for (i in (0 until 1000000000 % cycle)) {
+        input.moves.forEach { it.act(programs) }
     }
 
     return programs.joinToString("")
