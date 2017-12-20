@@ -4,25 +4,25 @@ import kotlin.system.measureTimeMillis
 
 data class Input(val raw: List<String>, val particles: List<Particle>)
 
-data class Particle(val position: Vector3, val velocity: Vector3, val acceleration: Vector3)
+data class Particle(val position: Vector3, val velocity: Vector3, val acceleration: Vector3) {
+    fun update(): Particle {
+        val newVelocity = velocity + acceleration
+        val newPosition = position + newVelocity
+        return Particle(newPosition, newVelocity, acceleration)
+    }
 
-fun Particle.update(): Particle {
-    val newVelocity = velocity.add(acceleration)
-    val newPosition = position.add(newVelocity)
-    return Particle(newPosition, newVelocity, acceleration)
+    fun distanceToZero(): Double {
+        return Math.abs(position.x) + Math.abs(position.y) + Math.abs(position.z)
+    }
 }
 
-fun Particle.distanceToZero(): Double {
-    return Math.abs(position.x) + Math.abs(position.y) + Math.abs(position.z)
-}
-
-data class Vector3(val x: Double, val y: Double, val z: Double)
-
-fun Vector3.add(other: Vector3): Vector3 {
-    val newX = this.x + other.x
-    val newY = this.y + other.y
-    val newZ = this.z + other.z
-    return Vector3(newX, newY, newZ)
+data class Vector3(val x: Double, val y: Double, val z: Double) {
+    operator fun plus(other: Vector3): Vector3 {
+        val newX = this.x + other.x
+        val newY = this.y + other.y
+        val newZ = this.z + other.z
+        return Vector3(newX, newY, newZ)
+    }
 }
 
 fun main(args : Array<String>) {
