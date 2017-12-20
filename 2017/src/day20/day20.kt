@@ -52,7 +52,6 @@ fun parseParticle(line: List<Double>) : Particle {
     return Particle(position, velocity, acceleration)
 }
 
-
 fun solve2(input: Input) : String {
     var particles = input.particles
     var lastSize = 1001
@@ -88,15 +87,12 @@ fun removeCollisions(particles: List<Particle>) : List<Particle> {
 
 fun solve1(input: Input) : String {
     var particles = input.particles
-    repeat(1000) {
-        particles = particles.map{ it.update() }
-    }
 
     var lastClosestParticle = 0
     var closestParticle = 1
 
     while (lastClosestParticle != closestParticle) {
-        repeat(5) {
+        repeat(200) {
             particles = particles.map{ it.update() }
         }
         lastClosestParticle = closestParticle
