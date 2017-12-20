@@ -26,8 +26,8 @@ fun parse() : Input {
 
 fun solve2(input: Input) : String {
     return runBlocking {
-        val channelOne = Channel<Long>(1000)
-        val channelTwo = Channel<Long>(1000)
+        val channelOne = Channel<Long>(100)
+        val channelTwo = Channel<Long>(100)
 
         async { run(input.lines, 0L, channelOne, channelTwo) }
         val counterTwo = async { run(input.lines, 1L, channelTwo, channelOne) }
@@ -37,7 +37,7 @@ fun solve2(input: Input) : String {
 }
 
 suspend fun run(lines: List<String>, programID: Long, sendChannel: Channel<Long>, receiveChannel: Channel<Long>): Int {
-    val registers = mutableMapOf<String, Long>()
+    val registers = mutableMapOf<String, Long>().withDefault { 0 }
     var position = 0
     val numberOfInstructions = lines.size
     var counter = 0
@@ -64,8 +64,7 @@ suspend fun run(lines: List<String>, programID: Long, sendChannel: Channel<Long>
 }
 
 suspend fun sndReal(registers: MutableMap<String, Long>, firstArgument: String, sendChannel: Channel<Long>) : Int {
-    val firstInt = firstArgument.toLongOrNull() ?: registers[firstArgument]!!
-
+    val firstInt = firstArgument.toLongOrNull() ?: registers.getValue(firstArgument)
 
     sendChannel.send(firstInt)
 
@@ -87,7 +86,7 @@ suspend fun rcvReal(registers: MutableMap<String, Long>, firstArgument: String, 
 
 
 fun solve1(input: Input) : String {
-    val registers = mutableMapOf<String, Long>()
+    val registers = mutableMapOf<String, Long>().withDefault { 0 }
 
     var position = 0
 
@@ -112,7 +111,7 @@ fun solve1(input: Input) : String {
 }
 
 fun snd(registers: MutableMap<String, Long>, firstArgument: String) : Int {
-    val firstInt = firstArgument.toLongOrNull() ?: registers[firstArgument]!!
+    val firstInt = firstArgument.toLongOrNull() ?: registers.getValue(firstArgument)
 
     registers.put("snd", firstInt)
 
@@ -120,7 +119,7 @@ fun snd(registers: MutableMap<String, Long>, firstArgument: String) : Int {
 }
 
 fun rcv(registers: MutableMap<String, Long>, firstArgument: String) : Int {
-    val key = firstArgument.toLongOrNull() ?: registers[firstArgument]!!
+    val key = firstArgument.toLongOrNull() ?: registers.getValue(firstArgument)
 
     if (key != 0.toLong()) {
         val snd = registers.remove("snd")!!
@@ -130,28 +129,28 @@ fun rcv(registers: MutableMap<String, Long>, firstArgument: String) : Int {
 }
 
 fun set(registers: MutableMap<String, Long>, firstArgument: String, secondArgument: String) : Int {
-    val value = secondArgument.toLongOrNull() ?: registers[secondArgument]!!
+    val value = secondArgument.toLongOrNull() ?: registers.getValue(secondArgument)
 
     registers.put(firstArgument, value)
     return 1
 
 }
 fun add(registers: MutableMap<String, Long>, firstArgument: String, secondArgument: String) : Int {
-    val value = secondArgument.toLongOrNull() ?: registers[secondArgument]!!
+    val value = secondArgument.toLongOrNull() ?: registers.getValue(secondArgument)
 
     val regValue = registers[firstArgument] ?: 0
     registers.put(firstArgument, regValue + value)
     return 1
 }
 fun mul(registers: MutableMap<String, Long>, firstArgument: String, secondArgument: String) : Int {
-    val value = secondArgument.toLongOrNull() ?: registers[secondArgument]!!
+    val value = secondArgument.toLongOrNull() ?: registers.getValue(secondArgument)
 
     val regValue = registers[firstArgument] ?: 0
     registers.put(firstArgument, regValue * value)
     return 1
 }
 fun mod(registers: MutableMap<String, Long>, firstArgument: String, secondArgument: String) : Int {
-    val value = secondArgument.toLongOrNull() ?: registers[secondArgument]!!
+    val value = secondArgument.toLongOrNull() ?: registers.getValue(secondArgument)
 
     val regValue = registers[firstArgument] ?: 0
     registers.put(firstArgument, regValue % value)
@@ -159,9 +158,9 @@ fun mod(registers: MutableMap<String, Long>, firstArgument: String, secondArgume
 }
 fun jgz(registers: MutableMap<String, Long>, firstArgument: String, secondArgument: String) : Int {
 
-    val firstValue = firstArgument.toLongOrNull() ?: registers[firstArgument]!!
+    val firstValue = firstArgument.toLongOrNull() ?: registers.getValue(firstArgument)
 
-    val secondValue = secondArgument.toLongOrNull() ?: registers[secondArgument]!!
+    val secondValue = secondArgument.toLongOrNull() ?: registers.getValue(secondArgument)
 
     if (firstValue > 0L) {
         return secondValue.toInt()
