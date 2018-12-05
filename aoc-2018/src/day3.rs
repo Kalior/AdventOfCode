@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::prelude::*;
+
 extern crate regex;
 
 use regex::Regex;
@@ -26,6 +27,7 @@ pub fn solve() {
 
     let answer1: i32 = solve1(rectangles.as_slice());
     println!("{:?}", answer1);
+
     let answer2 = solve2(rectangles.as_slice());
     println!("{:?}", answer2);
 }

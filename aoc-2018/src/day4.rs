@@ -75,20 +75,15 @@ fn parse() -> Vec<Entry> {
     // [1518-05-23 00:59] wakes up
     let re = Regex::new(r".(\d+).(\d+).(\d+) (\d+).(\d+). (.+)").unwrap();
 
-    let mut entries: Vec<Entry> = contents
-        .lines()
-        .map(|l| {
-            re.captures_iter(l)
-                .map(|cap| Entry {
-                    year: cap[1].parse::<i32>().unwrap_or(-1),
-                    month: cap[2].parse::<i32>().unwrap_or(-1),
-                    day: cap[3].parse::<i32>().unwrap_or(-1),
-                    hour: cap[4].parse::<i32>().unwrap_or(-1),
-                    minute: cap[5].parse::<i32>().unwrap_or(-1),
-                    action: parse_action(&cap[6]),
-                })
-                .next()
-                .unwrap()
+    let mut entries: Vec<Entry> = re
+        .captures_iter(&contents)
+        .map(|cap| Entry {
+            year: cap[1].parse::<i32>().unwrap_or(-1),
+            month: cap[2].parse::<i32>().unwrap_or(-1),
+            day: cap[3].parse::<i32>().unwrap_or(-1),
+            hour: cap[4].parse::<i32>().unwrap_or(-1),
+            minute: cap[5].parse::<i32>().unwrap_or(-1),
+            action: parse_action(&cap[6]),
         })
         .collect();
     entries.sort_unstable();
@@ -115,21 +110,20 @@ fn parse_action(action: &str) -> Action {
 fn solve1(entries: &[Entry]) -> i32 {
     let sleeping = create_sleeping_schedule(entries);
 
-    let mut most_sleeping_guard_id = 0;
-    let mut most_sleeping_guard_times = Vec::new();
-    let mut minutes_spent_asleep = 0;
-    for (guard_id, times) in &sleeping {
-        if times.len() >= minutes_spent_asleep {
-            most_sleeping_guard_times = times.to_vec();
-            minutes_spent_asleep = times.len();
-            most_sleeping_guard_id = *guard_id;
-        }
-    }
+    let (guard_id, _, guard_times) = sleeping.iter().fold(
+        (0, 0, Vec::<i32>::new()),
+        |(guard_id, longest_sleep, guard_times), (new_guard_id, times)| {
+            if times.len() >= longest_sleep {
+                (*new_guard_id, times.len(), times.to_vec())
+            } else {
+                (guard_id, longest_sleep, guard_times)
+            }
+        },
+    );
 
-    let (most_sleeping_minute, most_sleeping_times) =
-        get_most_sleeping_minute(most_sleeping_guard_times.to_vec());
+    let (most_sleeping_minute, _) = get_most_sleeping_minute(guard_times.to_vec());
 
-    return most_sleeping_guard_id * most_sleeping_minute;
+    return guard_id * most_sleeping_minute;
 }
 
 fn create_sleeping_schedule(entries: &[Entry]) -> HashMap<i32, Vec<i32>> {
