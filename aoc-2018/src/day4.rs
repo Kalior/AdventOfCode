@@ -159,19 +159,18 @@ fn insert_sleeping_time(
 fn solve2(entries: &[Entry]) -> i32 {
     let sleeping = create_sleeping_schedule(entries);
 
-    let mut most_sleeping_guard_id = 0;
-    let mut most_sleeping_guard_minute = 0;
-    let mut minutes_spent_asleep = 0;
-    for (guard_id, times) in &sleeping {
-        let (most_sleeping_minute, most_sleeping_times) = get_most_sleeping_minute(times.to_vec());
-
-        if most_sleeping_times >= minutes_spent_asleep {
-            minutes_spent_asleep = most_sleeping_times;
-            most_sleeping_guard_minute = most_sleeping_minute;
-            most_sleeping_guard_id = *guard_id;
-        }
-    }
-
+    let (most_sleeping_guard_id, _, most_sleeping_guard_minute) = sleeping.iter().fold(
+        (0, 0, 0),
+        |(guard_id, longest_sleep, most_sleeping_guard_minute), (new_guard_id, times)| {
+            let (most_sleeping_minute, most_sleeping_times) =
+                get_most_sleeping_minute(times.to_vec());
+            if most_sleeping_times >= longest_sleep {
+                (*new_guard_id, most_sleeping_times, most_sleeping_minute)
+            } else {
+                (guard_id, longest_sleep, most_sleeping_guard_minute)
+            }
+        },
+    );
     most_sleeping_guard_id * most_sleeping_guard_minute
 }
 

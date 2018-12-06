@@ -23,13 +23,13 @@ fn parse() -> String {
     f.read_to_string(&mut contents)
         .expect("something went wrong reading the file");
 
-    contents
+    contents.lines().next().unwrap().to_string()
 }
 
 fn solve1(polymer: &String) -> usize {
-    let mut remaining_polymer = fully_react_polymer(&polymer);
+    let remaining_polymer = fully_react_polymer(&polymer);
 
-    return remaining_polymer.len() - 1;
+    return remaining_polymer.len();
 }
 
 fn solve2(polymer: &String) -> usize {
@@ -53,7 +53,7 @@ fn solve2(polymer: &String) -> usize {
         })
         .min()
         .unwrap();
-    reacted_length - 1
+    reacted_length
 }
 
 fn fully_react_polymer(polymer: &String) -> Vec<char> {
