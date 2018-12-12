@@ -120,7 +120,7 @@ fn square_val(power_grid: &Vec<Vec<i32>>, x: usize, y: usize, max_size: usize) -
     let mut best_size = 0;
     let mut best_val: i32 = 0;
     let mut new_val: i32 = 0;
-    while (best_val - new_val).abs() < 30 {
+    while (best_val - new_val).abs() < 20 {
         size += 1;
         if x + size > max_size || y + size > max_size {
             return (best_val, best_size);
