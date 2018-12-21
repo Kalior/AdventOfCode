@@ -1,5 +1,6 @@
 use std::cmp::Ordering;
 use std::collections::HashMap;
+use std::collections::HashSet;
 use std::fs::File;
 use std::io::prelude::*;
 
@@ -141,8 +142,8 @@ impl Cart {
 
     fn intersection(self) -> Cart {
         let rotated_cart = match self.next_intersection {
-            TurnDirection::Left => self.leftcurve(),
-            TurnDirection::Right => self.rightcurve(),
+            TurnDirection::Left => self.leftturn(),
+            TurnDirection::Right => self.rightturn(),
             TurnDirection::Straight => self.clone(),
         };
 
@@ -151,6 +152,37 @@ impl Cart {
             pos: rotated_cart.pos,
             direction: rotated_cart.direction,
             next_intersection: rotated_cart.next_intersection.next(),
+        }
+    }
+
+    fn leftturn(self) -> Cart {
+        let next_direction = match self.direction {
+            Direction::Up => Direction::Left,
+            Direction::Right => Direction::Up,
+            Direction::Down => Direction::Right,
+            Direction::Left => Direction::Down,
+        };
+
+        Cart {
+            id: self.id,
+            pos: self.pos,
+            direction: next_direction,
+            next_intersection: self.next_intersection,
+        }
+    }
+
+    fn rightturn(self) -> Cart {
+        let next_direction = match self.direction {
+            Direction::Up => Direction::Right,
+            Direction::Right => Direction::Down,
+            Direction::Down => Direction::Left,
+            Direction::Left => Direction::Up,
+        };
+        Cart {
+            id: self.id,
+            pos: self.pos,
+            direction: next_direction,
+            next_intersection: self.next_intersection,
         }
     }
 }
@@ -167,7 +199,7 @@ enum Track {
 pub fn solve() {
     let (carts, tracks) = parse();
     solve1(&carts, tracks.clone());
-    solve2(carts.to_vec(), tracks.clone());
+    solve2(&carts, tracks.clone());
 }
 
 fn parse() -> (Vec<Cart>, HashMap<Position, Track>) {
@@ -248,17 +280,8 @@ fn solve1(carts: &Vec<Cart>, tracks: HashMap<Position, Track>) {
     let mut moving_carts: Vec<Cart> = carts.clone();
     moving_carts.sort_unstable();
 
-    let mut collisions: Vec<Position> = Vec::new();
-
-    let mut crash_pos = Position { y: -1, x: -1 };
     loop {
-        let collisions = collides(&moving_carts, &moving_carts);
-        if collisions.len() > 0 {
-            break;
-        }
-
         let mut next_carts = Vec::new();
-        let mut collided = false;
         let mut updated_carts: Vec<Cart> = moving_carts.clone();
 
         for cart in moving_carts.iter() {
@@ -267,29 +290,15 @@ fn solve1(carts: &Vec<Cart>, tracks: HashMap<Position, Track>) {
             updated_carts.push(new_cart.clone());
             next_carts.push(new_cart);
 
-            let collisions = collides(&next_carts, &next_carts);
+            let collisions = collides(&next_carts, &updated_carts);
 
             if collisions.len() > 0 {
                 println!("{:?}", collisions);
-                if (collisions[0].direction == Direction::Up
-                    && collisions[1].direction == Direction::Down)
-                    || (collisions[0].direction == Direction::Down
-                        && collisions[1].direction == Direction::Up)
-                    || (collisions[0].direction == Direction::Left
-                        && collisions[1].direction == Direction::Right)
-                    || (collisions[0].direction == Direction::Right
-                        && collisions[1].direction == Direction::Left)
-                {
-                    crash_pos = collisions[0].pos.clone();
-                    collided = true;
-                    break;
-                }
-            }
-        }
+                let crash_pos = collisions[0].pos.clone();
 
-        if collided {
-            println!("Part one: {},{}", crash_pos.x, crash_pos.y);
-            return;
+                println!("Part one: {},{}", crash_pos.x, crash_pos.y);
+                return;
+            }
         }
 
         moving_carts = next_carts.clone();
@@ -305,11 +314,6 @@ fn solve1(carts: &Vec<Cart>, tracks: HashMap<Position, Track>) {
         moving_carts.sort_unstable();
         // print_carts(&moving_carts, &tracks);
     }
-
-    let collisions = collides(&moving_carts, &moving_carts);
-    let crash_pos = collisions[0].pos.clone();
-
-    println!("Part one: {},{}", crash_pos.x, crash_pos.y);
 }
 
 fn collides(from_carts: &Vec<Cart>, to_carts: &Vec<Cart>) -> Vec<Cart> {
@@ -361,6 +365,60 @@ fn print_carts(carts: &Vec<Cart>, tracks: &HashMap<Position, Track>) {
     println!("-------------------------")
 }
 
-fn solve2(carts: Vec<Cart>, tracks: HashMap<Position, Track>) {
-    println!("{:?},{:?},{:?}", 0, 0, 0);
+fn solve2(carts: &Vec<Cart>, tracks: HashMap<Position, Track>) {
+    let mut moving_carts: Vec<Cart> = carts.clone();
+    moving_carts.sort_unstable();
+
+    while moving_carts.len() > 1 {
+        let mut next_carts = Vec::new();
+        let mut updated_carts: Vec<Cart> = moving_carts.clone();
+
+        let mut crashed_carts = HashSet::new();
+        for cart in moving_carts.iter() {
+            if crashed_carts.contains(&cart.id) {
+                continue;
+            }
+
+            let new_cart = cart.move_cart();
+            next_carts.push(new_cart.clone());
+
+            updated_carts.remove(0);
+            updated_carts.push(new_cart.clone());
+
+            let collisions = collides(&next_carts, &updated_carts);
+
+            for crashed_cart in &collisions {
+                crashed_carts.insert(crashed_cart.id);
+
+                let updated_cart_index =
+                    updated_carts.iter().position(|&c| c.id == crashed_cart.id);
+
+                if updated_cart_index.is_some() {
+                    updated_carts.remove(updated_cart_index.unwrap());
+                }
+
+                let next_cart_index = next_carts.iter().position(|&c| c.id == crashed_cart.id);
+                if next_cart_index.is_some() {
+                    next_carts.remove(next_cart_index.unwrap());
+                }
+            }
+        }
+
+        moving_carts = next_carts.clone();
+
+        moving_carts = moving_carts
+            .iter()
+            .map(|cart| {
+                let track = tracks.get(&cart.pos).unwrap();
+                cart.rotate(*track)
+            })
+            .collect();
+
+        moving_carts.sort_unstable();
+        // print_carts(&moving_carts, &tracks);
+    }
+
+    let last_cart = moving_carts.get(0).unwrap();
+
+    println!("Part two: {},{}", &last_cart.pos.x, &last_cart.pos.y);
 }
