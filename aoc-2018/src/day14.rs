@@ -27,11 +27,11 @@ fn solve1(iterations: i32) {
             recipie_board.push(score);
             n_recipie += 1;
         } else {
-            let score_one = score - 10;
-            let score_two = score / 10;
+            let score_two = score - 10;
+            let score_one = score / 10;
 
-            recipie_board.push(score_two);
             recipie_board.push(score_one);
+            recipie_board.push(score_two);
 
             n_recipie += 2;
         }
@@ -71,42 +71,43 @@ fn solve2(iterations: i32) {
         if score < 10 {
             recipie_board.push(score);
         } else {
-            let score_one = score - 10;
-            let score_two = score / 10;
+            let score_one = score / 10;
+            let score_two = score - 10;
 
-            recipie_board.push(score_two);
+            recipie_board.push(score_one);
 
-            let start_index: usize = max((recipie_board.len() as i32 - 6) as usize, 0);
-
-            let last_6 = (start_index..recipie_board.len())
-                .map(|i| recipie_board.get(i).unwrap())
-                .map(|&i| i.to_string())
-                .collect::<Vec<String>>()
-                .join("");
+            let (start_index, last_6) = last_6_string(&recipie_board);
 
             if last_6 == iterations_string {
                 println!("Part two: {:?}", start_index);
                 return;
             }
-            recipie_board.push(score_one);
+
+            recipie_board.push(score_two);
+        }
+
+        let (start_index, last_6) = last_6_string(&recipie_board);
+
+        if last_6 == iterations_string {
+            println!("Part two: {:?}", start_index);
+            return;
         }
 
         elves = elves
             .iter()
             .map(|&i| (i + (recipie_board.get(i).unwrap() + 1) as usize) % recipie_board.len())
             .collect();
-
-        let start_index: usize = max((recipie_board.len() as i32 - 6) as usize, 0);
-
-        let last_6 = (start_index..recipie_board.len())
-            .map(|i| recipie_board.get(i).unwrap())
-            .map(|&i| i.to_string())
-            .collect::<Vec<String>>()
-            .join("");
-
-        if last_6 == iterations_string {
-            println!("Part two: {:?}", start_index);
-            return;
-        }
     }
+}
+
+fn last_6_string(recipie_board: &Vec<i32>) -> (usize, String) {
+    let start_index: usize = max((recipie_board.len() as i32 - 6) as usize, 0);
+
+    let last_6 = (start_index..recipie_board.len())
+        .map(|i| recipie_board.get(i).unwrap())
+        .map(|&i| i.to_string())
+        .collect::<Vec<String>>()
+        .join("");
+
+    return (start_index, last_6);
 }
