@@ -1,6 +1,6 @@
 #![feature(duration_as_u128)]
-mod day14;
+mod day15;
 
 fn main() {
-    day14::solve();
+    day15::solve();
 }
