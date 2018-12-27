@@ -21,9 +21,9 @@ fn parse() -> Vec<i32> {
 
 
 fn solve1(input: i32) {
-    println!("{:?},{:?}", 0, 0);
+    println!("Part one: {}", -1);
 }
 
 fn solve2(input: i32) {
-    println!("{:?},{:?},{:?}", 0, 0, 0);
+    println!("Part two: {}", -1);
 }
