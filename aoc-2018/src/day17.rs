@@ -96,17 +96,20 @@ fn solve1(map: &HashMap<Position, Type>) {
 
     let simulated_map = run_water_simulation(&map);
 
-    let n_water = simulated_map
-        .iter()
+    let n_water = number_of_water(&simulated_map, largest_y, lowest_y);
+
+    println!("Part one: {}", n_water);
+}
+
+fn number_of_water(map: &HashMap<Position, Type>, largest_y: i32, lowest_y: i32) -> i32 {
+    map.iter()
         .filter(|(p, _)| p.y <= largest_y && p.y >= lowest_y)
         .map(|(_, t)| match t {
             Type::FlowingWater => 1,
             Type::StillWater => 1,
             _ => 0,
         })
-        .sum::<i32>();
-
-    println!("Part one: {}", n_water);
+        .sum::<i32>()
 }
 
 fn run_water_simulation(map: &HashMap<Position, Type>) -> HashMap<Position, Type> {
@@ -147,13 +150,16 @@ fn run_water_simulation(map: &HashMap<Position, Type>) -> HashMap<Position, Type
 
             let mut new_parent_positions = parent_positions.clone();
             let first_parent = new_parent_positions.pop_back();
+
             if first_parent.is_some() {
                 let first_parent: Position = first_parent.unwrap();
                 to_consider.push_back((first_parent, new_parent_positions.clone()));
             }
+
             if map.get(&pos_to_consider.leftof()).unwrap_or(&Type::Sand) == &Type::FlowingWater {
                 to_consider.push_back((pos_to_consider.leftof(), parent_positions.clone()));
             }
+
             if map.get(&pos_to_consider.rightof()).unwrap_or(&Type::Sand) == &Type::FlowingWater {
                 to_consider.push_back((pos_to_consider.rightof(), parent_positions.clone()));
             }
@@ -185,7 +191,9 @@ fn run_water_simulation(map: &HashMap<Position, Type>) -> HashMap<Position, Type
 fn print_state(map: &HashMap<Position, Type>) {
     let last_x = map.keys().map(|p| p.x).max().unwrap();
     let first_x = map.keys().map(|p| p.x).min().unwrap();
+
     let last_y = map.keys().map(|p| p.y).max().unwrap();
+
     for y in 0..last_y + 1 {
         for x in first_x..last_x + 1 {
             let pos = Position { y: y, x: x };
@@ -217,6 +225,7 @@ fn in_closed_space(position: Position, map: &HashMap<Position, Type>) -> bool {
 
     let mut left = position.leftof();
     let mut left_type = map.get(&left).unwrap_or(&Type::Sand);
+
     while left_type != &Type::Clay {
         let under = map.get(&left.under()).unwrap_or(&Type::Sand);
         if under == &Type::Sand || under == &Type::FlowingWater {
