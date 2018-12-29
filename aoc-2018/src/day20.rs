@@ -54,6 +54,7 @@ enum MapType {
     Room,
     VerticalDoor,
     HorizontalDoor,
+    Unknown,
 }
 
 pub fn solve() {
@@ -145,7 +146,7 @@ fn count_room_distance(map: &HashMap<Position, MapType>) -> HashMap<Position, i3
         let (room_pos, room_score) = rooms.pop_front().unwrap();
 
         for (maybe_door, maybe_room) in room_pos.possible_adjacent_rooms().iter() {
-            let maybe_door_type = map.get(maybe_door).unwrap_or(&MapType::Wall);
+            let maybe_door_type = map.get(maybe_door).unwrap_or(&MapType::Unknown);
             if maybe_door_type == &MapType::HorizontalDoor
                 || maybe_door_type == &MapType::VerticalDoor
             {
@@ -183,11 +184,12 @@ fn print_map(map: &HashMap<Position, MapType>) {
     for y in first_y..last_y + 1 {
         for x in first_x..last_x + 1 {
             let pos = Position { y: y, x: x };
-            let s = match map.get(&pos).unwrap_or(&MapType::Wall) {
+            let s = match map.get(&pos).unwrap_or(&MapType::Unknown) {
                 MapType::Room => '.',
                 MapType::VerticalDoor => '|',
                 MapType::HorizontalDoor => '-',
                 MapType::Wall => '#',
+                MapType::Unknown => '?',
             };
             print!("{}", s);
         }
