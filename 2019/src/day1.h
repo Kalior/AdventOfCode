@@ -48,7 +48,7 @@ public:
   }
 
   static int extra_fuel_requirements(int module_requirement) {
-    int extra = 0;
+    int extra {0};
     int new_fuel_requirement = fuel_requirement(module_requirement);
     while (new_fuel_requirement > 0) {
       extra += new_fuel_requirement;

@@ -1,9 +1,9 @@
 #include <iostream>
 
-#include "src/day1.h"
+#include "src/day2.h"
 
 int main() {
-  aoc::day1::solve("inputs/day1");
+  aoc::day2::solve("inputs/day2");
 
   return EXIT_SUCCESS;
 }
