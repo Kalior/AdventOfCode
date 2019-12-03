@@ -39,5 +39,6 @@ macro(test_case unit_test)
     unset (target)
 endmacro(test_case)
 
-test_case(day1_tests.cpp)
-test_case(day2_tests.cpp)
+test_case(day1_test.cpp)
+test_case(day2_test.cpp)
+test_case(day3_test.cpp)

@@ -6,5 +6,5 @@ set(CMAKE_CXX_STANDARD 20)
 
 add_subdirectory(tests)
 
-add_executable(2019 main.cpp src/day1.h src/day2.h)
+add_executable(2019 main.cpp src/day1.h src/day2.h src/day3.h)
 
