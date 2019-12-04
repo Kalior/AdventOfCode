@@ -27,6 +27,7 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 
 dependency(googletest)
 
+
 macro(test_case unit_test)
     get_filename_component(target "${unit_test}" NAME_WE)
 
@@ -42,3 +43,4 @@ endmacro(test_case)
 test_case(day1_test.cpp)
 test_case(day2_test.cpp)
 test_case(day3_test.cpp)
+test_case(day4_test.cpp)
