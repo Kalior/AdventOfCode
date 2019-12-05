@@ -6,6 +6,8 @@
 #include <string>
 #include <vector>
 
+#include "intcode.h"
+
 namespace aoc {
 
 class day2 {
@@ -44,20 +46,7 @@ public:
     int program_pointer = 0;
 
     while (program[program_pointer] != 99) {
-      run_instruction(program, program_pointer);
-      program_pointer += 4;
-    }
-  }
-
-  static void run_instruction(std::vector<int> &program, int program_pointer) {
-    int op_code = program[program_pointer];
-    int value_one = program[program[program_pointer + 1]];
-    int value_two = program[program[program_pointer + 2]];
-    int output_position = program[program_pointer + 3];
-    if (op_code == 1) {
-      program[output_position] = value_one + value_two;
-    } else if (op_code == 2) {
-      program[output_position] = value_one * value_two;
+      program_pointer = intcode::run_instruction(program, program_pointer);
     }
   }
 
