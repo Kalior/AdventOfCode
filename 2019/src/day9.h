@@ -12,7 +12,7 @@
 
 namespace aoc {
 
-class day5 {
+class day9 {
 public:
   static void solve(const std::string &input_path) {
     auto program = parse(input_path);
@@ -36,7 +36,7 @@ public:
     return program;
   }
 
-  static int part_one(intcode::program_t program) {
+  static long long int part_one(aoc::intcode::program_t program) {
     aoc::intcode::channel inputs{1};
     aoc::intcode::channel outputs{};
     aoc::intcode::run_program(program, inputs, outputs);
@@ -45,13 +45,12 @@ public:
   }
 
 
-
-  static int part_two(intcode::program_t program) {
-    aoc::intcode::channel inputs{5};
+  static int part_two(aoc::intcode::program_t program) {
+    aoc::intcode::channel inputs{2};
     aoc::intcode::channel outputs{};
     aoc::intcode::run_program(program, inputs, outputs);
 
-    return outputs[0];
+    return outputs.back();
   }
 
 }; // namespace aoc

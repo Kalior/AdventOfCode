@@ -1,11 +1,16 @@
+#pragma once
+
 #include <array>
-#include <iostream>
-#include <vector>
-#include <deque>
 #include <chrono>
+#include <deque>
+#include <iostream>
 #include <thread>
+#include <vector>
 
 namespace aoc::intcode {
+
+using program_t = std::vector<long long int>;
+using channel = std::deque<long long int>;
 
 static std::array<int, 4> get_parameters(int instruction) {
   int op_code = instruction % 100;
@@ -15,138 +20,228 @@ static std::array<int, 4> get_parameters(int instruction) {
   return {mode_a, mode_b, mode_c, op_code};
 }
 
-int get_value(std::vector<int> &program, int program_pointer, int mode) {
-  if (mode == 0) {
-    return program.at(program.at(program_pointer));
-  } else {
-    return program.at(program_pointer);
+size_t get_address(program_t &program, size_t program_pointer, int mode,
+                   size_t relative_base) {
+  size_t output = 0;
+  if (program_pointer >= program.size()) {
+    program.resize(program_pointer + 1, 0);
   }
+
+  if (mode == 0) {
+    output = program[program_pointer];
+  } else if (mode == 1) {
+    output = program_pointer;
+  } else {
+    output = relative_base + program[program_pointer];
+  }
+
+  if (output >= program.size()) {
+    program.resize( output + 1, 0);
+  }
+  return output;
 }
 
-int add(std::vector<int> &program, int program_pointer, int mode_b,
-        int mode_c) {
-  int value_one = get_value(program, program_pointer + 1, mode_c);
-  int value_two = get_value(program, program_pointer + 2, mode_b);
-  int output = program.at(program_pointer + 3);
-  program.at(output) = value_one + value_two;
-  return program_pointer + 4;
+void add(program_t &program, size_t &program_pointer, size_t relative_base,
+         int mode_a, int mode_b, int mode_c) {
+  size_t address_one =
+      get_address(program, program_pointer + 1, mode_c, relative_base);
+  size_t address_two =
+      get_address(program, program_pointer + 2, mode_b, relative_base);
+
+  size_t output =
+      get_address(program, program_pointer + 3, mode_a, relative_base);
+
+  if (mode_a == 1) {
+    throw std::invalid_argument("ADD: WRONG MODE FOR OUTPUT");
+  }
+
+  program[output] = program[address_one] + program[address_two];
+  program_pointer += 4;
 }
 
-int mul(std::vector<int> &program, int program_pointer, int mode_b,
-        int mode_c) {
-  int value_one = get_value(program, program_pointer + 1, mode_c);
-  int value_two = get_value(program, program_pointer + 2, mode_b);
-  int output = program.at(program_pointer + 3);
-  program.at(output) = value_one * value_two;
-  return program_pointer + 4;
+void mul(program_t &program, size_t &program_pointer, size_t relative_base,
+         int mode_a, int mode_b, int mode_c) {
+  size_t address_one =
+      get_address(program, program_pointer + 1, mode_c, relative_base);
+  size_t address_two =
+      get_address(program, program_pointer + 2, mode_b, relative_base);
+  size_t output =
+      get_address(program, program_pointer + 3, mode_a, relative_base);
+
+  if (mode_a == 1) {
+    throw std::invalid_argument("MUL: WRONG MODE FOR OUTPUT");
+  }
+
+  program[output] = program[address_one] * program[address_two];
+  program_pointer += 4;
 }
 
-int input(std::vector<int> &program, int program_pointer,
-          std::deque<int> &inputs) {
+void input(program_t &program, size_t &program_pointer, size_t relative_base,
+           channel &inputs, int mode_c) {
 
   while (inputs.empty()) {
     using namespace std::chrono_literals;
-    std::this_thread::sleep_for(10us);
 //    std::cout << "Give input: " << std::endl;
-//    std::cin >> val;
+    //    std::cin >> val;
+    std::this_thread::sleep_for(10us);
   }
 
-  int val = inputs.front();
+  auto val = inputs.front();
   inputs.pop_front();
 
-  int output = program.at(program_pointer + 1);
-  program.at(output) = val;
-  return program_pointer + 2;
+  size_t output =
+      get_address(program, program_pointer + 1, mode_c, relative_base);
+
+  if (mode_c == 1) {
+    throw std::invalid_argument("INPUT: WRONG MODE FOR OUTPUT");
+  }
+
+  program[output] = val;
+  program_pointer += 2;
 }
 
-int output(std::vector<int> &program, int program_pointer,
-           std::deque<int> &outputs, int mode_c) {
-  int value_one = get_value(program, program_pointer + 1, mode_c);
-  outputs.push_back(value_one);
-//  std::cout << value_one << std::endl;
-  return program_pointer + 2;
+void output(program_t &program, size_t &program_pointer, size_t relative_base,
+            channel &outputs, int mode_c) {
+  size_t address_one =
+      get_address(program, program_pointer + 1, mode_c, relative_base);
+
+  outputs.push_back(program[address_one]);
+  //  std::cout << program[address_one] << std::endl;
+  program_pointer += 2;
 }
 
-int jump_neq(std::vector<int> &program, int program_pointer, int mode_b,
-             int mode_c) {
-  int value_one = get_value(program, program_pointer + 1, mode_c);
-  int value_two = get_value(program, program_pointer + 2, mode_b);
-  if (value_one != 0) {
-    return value_two;
+void jump_neq(program_t &program, size_t &program_pointer, size_t relative_base,
+              int mode_b, int mode_c) {
+  size_t address_one =
+      get_address(program, program_pointer + 1, mode_c, relative_base);
+  size_t address_two =
+      get_address(program, program_pointer + 2, mode_b, relative_base);
+
+  if (program[address_one] != 0) {
+    program_pointer = program[address_two];
   } else {
-    return program_pointer + 3;
+    program_pointer += 3;
   }
 }
 
-int jump_eq(std::vector<int> &program, int program_pointer, int mode_b,
-            int mode_c) {
-  int value_one = get_value(program, program_pointer + 1, mode_c);
-  int value_two = get_value(program, program_pointer + 2, mode_b);
-  if (value_one == 0) {
-    return value_two;
+void jump_eq(program_t &program, size_t &program_pointer, size_t relative_base,
+             int mode_b, int mode_c) {
+  size_t address_one =
+      get_address(program, program_pointer + 1, mode_c, relative_base);
+  size_t address_two =
+      get_address(program, program_pointer + 2, mode_b, relative_base);
+
+  if (program[address_one] == 0) {
+    program_pointer = program[address_two];
   } else {
-    return program_pointer + 3;
+    program_pointer += 3;
   }
 }
 
-int less_than(std::vector<int> &program, int program_pointer, int mode_b,
-              int mode_c) {
-  int value_one = get_value(program, program_pointer + 1, mode_c);
-  int value_two = get_value(program, program_pointer + 2, mode_b);
-  int output = program.at(program_pointer + 3);
-  if (value_one < value_two) {
-    program.at(output) = 1;
-  } else {
-    program.at(output) = 0;
+void less_than(program_t &program, size_t &program_pointer,
+               size_t relative_base, int mode_a, int mode_b, int mode_c) {
+  size_t address_one =
+      get_address(program, program_pointer + 1, mode_c, relative_base);
+  size_t address_two =
+      get_address(program, program_pointer + 2, mode_b, relative_base);
+  size_t output =
+      get_address(program, program_pointer + 3, mode_a, relative_base);
+
+  if (mode_a == 1) {
+    throw std::invalid_argument("LESS THAN: WRONG MODE FOR OUTPUT");
   }
-  return program_pointer + 4;
+
+  if (program[address_one] < program[address_two]) {
+    program[output] = 1;
+  } else {
+    program[output] = 0;
+  }
+  program_pointer += 4;
 }
 
-int equals(std::vector<int> &program, int program_pointer, int mode_b,
-           int mode_c) {
-  int value_one = get_value(program, program_pointer + 1, mode_c);
-  int value_two = get_value(program, program_pointer + 2, mode_b);
-  int output = program.at(program_pointer + 3);
-  if (value_one == value_two) {
-    program.at(output) = 1;
-  } else {
-    program.at(output) = 0;
+void equals(program_t &program, size_t &program_pointer, size_t relative_base,
+            int mode_a, int mode_b, int mode_c) {
+  size_t address_one =
+      get_address(program, program_pointer + 1, mode_c, relative_base);
+  size_t address_two =
+      get_address(program, program_pointer + 2, mode_b, relative_base);
+  size_t output =
+      get_address(program, program_pointer + 3, mode_a, relative_base);
+  if (mode_a == 1) {
+    throw std::invalid_argument("EQUALS: WRONG MODE FOR OUTPUT");
   }
-  return program_pointer + 4;
+
+  if (program[address_one] == program[address_two]) {
+    program[output] = 1;
+  } else {
+    program[output] = 0;
+  }
+  program_pointer += 4;
 }
 
-int run_instruction(std::vector<int> &program, int program_pointer,
-                    std::deque<int> &inputs, std::deque<int> &outputs) {
+void adjust_relative_base(program_t &program, size_t &program_pointer,
+                          size_t &relative_base, int mode_c) {
+  size_t address_one =
+      get_address(program, program_pointer + 1, mode_c, relative_base);
+
+  relative_base += program[address_one];
+
+  program_pointer += 2;
+}
+
+void run_instruction(program_t &program, size_t &program_pointer,
+                     size_t &relative_base, channel &inputs, channel &outputs) {
   auto [mode_a, mode_b, mode_c, op_code] =
-      get_parameters(program.at(program_pointer));
+      get_parameters(program[program_pointer]);
 
   if (op_code == 1) {
-    program_pointer = add(program, program_pointer, mode_b, mode_c);
+    add(program, program_pointer, relative_base, mode_a, mode_b, mode_c);
   } else if (op_code == 2) {
-    program_pointer = mul(program, program_pointer, mode_b, mode_c);
+    mul(program, program_pointer, relative_base, mode_a, mode_b, mode_c);
   } else if (op_code == 3) {
-    program_pointer = input(program, program_pointer, inputs);
+    input(program, program_pointer, relative_base, inputs, mode_c);
   } else if (op_code == 4) {
-    program_pointer = output(program, program_pointer, outputs, mode_c);
+    output(program, program_pointer, relative_base, outputs, mode_c);
   } else if (op_code == 5) {
-    program_pointer = jump_neq(program, program_pointer, mode_b, mode_c);
+    jump_neq(program, program_pointer, relative_base, mode_b, mode_c);
   } else if (op_code == 6) {
-    program_pointer = jump_eq(program, program_pointer, mode_b, mode_c);
+    jump_eq(program, program_pointer, relative_base, mode_b, mode_c);
   } else if (op_code == 7) {
-    program_pointer = less_than(program, program_pointer, mode_b, mode_c);
+    less_than(program, program_pointer, relative_base, mode_a, mode_b, mode_c);
   } else if (op_code == 8) {
-    program_pointer = equals(program, program_pointer, mode_b, mode_c);
+    equals(program, program_pointer, relative_base, mode_a, mode_b, mode_c);
+  } else if (op_code == 9) {
+    adjust_relative_base(program, program_pointer, relative_base, mode_c);
   } else {
     throw std::invalid_argument("No such opcode " + std::to_string(op_code));
   }
-
-  return program_pointer;
 }
 
-int run_instruction(std::vector<int> &program, int program_pointer) {
-  std::deque<int> inputs{};
-  std::deque<int> outputs{};
-  return run_instruction(program, program_pointer, inputs, outputs);
+static void run_program(program_t &program) {
+  size_t program_pointer = 0;
+  size_t relative_base = 0;
+  channel inputs{};
+  channel outputs{};
+
+  while (program[program_pointer] != 99) {
+    intcode::run_instruction(program, program_pointer, relative_base, inputs,
+                             outputs);
+  }
+}
+
+static void run_program(program_t &program, channel &inputs, channel &outputs) {
+  size_t program_pointer = 0;
+  size_t relative_base = 0;
+
+  while (program[program_pointer] != 99) {
+    intcode::run_instruction(program, program_pointer, relative_base, inputs,
+                             outputs);
+  }
+}
+
+static void run_program_thread(program_t program, channel &inputs,
+                               channel &outputs) {
+  run_program(program, inputs, outputs);
 }
 
 } // namespace aoc::intcode

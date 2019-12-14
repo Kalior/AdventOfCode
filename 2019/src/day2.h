@@ -24,8 +24,8 @@ public:
     std::cout << "Part two: " << sum << std::endl;
   }
 
-  static std::vector<int> parse(const std::string &input_path) {
-    std::vector<int> program{};
+  static aoc::intcode::program_t parse(const std::string &input_path) {
+    aoc::intcode::program_t program{};
     std::ifstream inputFile{input_path};
 
     for (std::string line; std::getline(inputFile, line, ',');) {
@@ -34,30 +34,23 @@ public:
     return program;
   }
 
-  static std::vector<int> part_one(std::vector<int> program) {
+  static aoc::intcode::program_t part_one(aoc::intcode::program_t program) {
     program[1] = 12;
     program[2] = 2;
-    run_program(program);
+    aoc::intcode::run_program(program);
 
     return program;
   }
 
-  static void run_program(std::vector<int> &program) {
-    int program_pointer = 0;
 
-    while (program[program_pointer] != 99) {
-      program_pointer = intcode::run_instruction(program, program_pointer);
-    }
-  }
-
-  static int part_two(std::vector<int> program) {
+  static int part_two(aoc::intcode::program_t program) {
     int sought_output = 19690720;
     for (int noun = 0; noun < 99; noun++) {
       for (int verb = 0; verb < 99; verb++) {
-        std::vector<int> new_program(program.begin(), program.end());
+        aoc::intcode::program_t new_program(program.begin(), program.end());
         new_program[1] = noun;
         new_program[2] = verb;
-        run_program(new_program);
+        aoc::intcode::run_program(new_program);
 
         if (new_program[0] == sought_output) {
           return 100 * noun + verb;

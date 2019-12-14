@@ -27,8 +27,8 @@ public:
     std::cout << "Part two: " << two << std::endl;
   }
 
-  static std::vector<int> parse(const std::string &input_path) {
-    std::vector<int> program{};
+  static aoc::intcode::program_t parse(const std::string &input_path) {
+    aoc::intcode::program_t program{};
     std::ifstream inputFile{input_path};
 
     for (std::string line; std::getline(inputFile, line, ',');) {
@@ -37,7 +37,7 @@ public:
     return program;
   }
 
-  static int part_one(const std::vector<int> &program) {
+  static int part_one(const aoc::intcode::program_t &program) {
 
     int max_output = 0;
     std::array<int, 5> phase_settings{0, 1, 2, 3, 4};
@@ -50,19 +50,19 @@ public:
     return max_output;
   }
 
-  static int run_amplifiers(const std::vector<int>& program,
+  static int run_amplifiers(const aoc::intcode::program_t &program,
                             std::array<int, 5> phase_settings) {
-    std::vector<std::deque<int>> inputs{};
+    std::vector<aoc::intcode::channel> inputs{};
     for (int i = 0; i < 5; i++) {
-      inputs.push_back(std::deque<int>{phase_settings[i]});
+      inputs.push_back(aoc::intcode::channel{phase_settings[i]});
     }
     inputs[0].push_back(0);
 
     std::vector<std::thread> threads{};
     for (int i = 0; i < 5; i++) {
       int output_i = i == 4 ? 0 : i + 1;
-      std::thread thread(run_program, program, std::ref(inputs[i]),
-                         std::ref(inputs[output_i]));
+      std::thread thread(aoc::intcode::run_program_thread, program,
+                         std::ref(inputs[i]), std::ref(inputs[output_i]));
       threads.push_back(std::move(thread));
     }
 
@@ -74,17 +74,7 @@ public:
     return output;
   }
 
-  static void run_program(std::vector<int> program, std::deque<int> &inputs,
-                          std::deque<int> &outputs) {
-    int program_pointer = 0;
-
-    while (program[program_pointer] != 99) {
-      program_pointer =
-          intcode::run_instruction(program, program_pointer, inputs, outputs);
-    }
-  }
-
-  static int part_two(const std::vector<int> &program) {
+  static int part_two(const aoc::intcode::program_t &program) {
     int max_output = 0;
     std::array<int, 5> phase_settings{5, 6, 7, 8, 9};
     do {
