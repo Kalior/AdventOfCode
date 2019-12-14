@@ -6,6 +6,7 @@
 #include <numeric>
 #include <string>
 #include <vector>
+#include <deque>
 
 #include "intcode.h"
 
@@ -16,8 +17,13 @@ public:
   static void solve(const std::string &input_path) {
     auto program = parse(input_path);
 
-    std::cout << "Part one: input 1.  Part two: input 5. "  << std::endl;
-    part_one(program);
+    auto valid = part_one(program);
+
+    std::cout << "Part one: " << valid << std::endl;
+
+    auto sum = part_two(program);
+
+    std::cout << "Part two: " << sum << std::endl;
   }
 
   static std::vector<int> parse(const std::string &input_path) {
@@ -30,18 +36,29 @@ public:
     return program;
   }
 
-  static std::vector<int> part_one(std::vector<int> program) {
-    run_program(program);
+  static int part_one(std::vector<int> program) {
+    std::deque<int> inputs{1};
+    std::deque<int> outputs{};
+    run_program(program, inputs, outputs);
 
-    return program;
+    return outputs.back();
   }
 
-  static void run_program(std::vector<int> &program) {
+  static void run_program(std::vector<int> &program, std::deque<int> &inputs, std::deque<int> &outputs) {
     int program_pointer = 0;
 
     while (program[program_pointer] != 99) {
-      program_pointer = intcode::run_instruction(program, program_pointer);
+      program_pointer = intcode::run_instruction(program, program_pointer, inputs, outputs);
     }
+  }
+
+
+  static int part_two(std::vector<int> program) {
+    std::deque<int> inputs{5};
+    std::deque<int> outputs{};
+    run_program(program, inputs, outputs);
+
+    return outputs[0];
   }
 
 }; // namespace aoc
