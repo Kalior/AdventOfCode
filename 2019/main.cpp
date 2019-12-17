@@ -1,13 +1,13 @@
 #include <iostream>
 #include <chrono>
 
-#include "src/day10.h"
+#include "src/day11.h"
 
 
 int main(int argc, char** argv) {
   auto start = std::chrono::high_resolution_clock::now();
 
-  aoc::day10::solve("inputs/day10");
+  aoc::day11::solve("inputs/day11");
 
   auto end = std::chrono::high_resolution_clock::now();
   auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);

@@ -32,7 +32,7 @@ public:
     std::ifstream inputFile{input_path};
 
     for (std::string line; std::getline(inputFile, line, ',');) {
-      program.push_back(std::stoi(line));
+      program.push_back(std::stol(line));
     }
     return program;
   }

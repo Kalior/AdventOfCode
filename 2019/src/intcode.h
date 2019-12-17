@@ -36,7 +36,7 @@ size_t get_address(program_t &program, size_t program_pointer, int mode,
   }
 
   if (output >= program.size()) {
-    program.resize( output + 1, 0);
+    program.resize(output + 1, 0);
   }
   return output;
 }
@@ -242,6 +242,7 @@ static void run_program(program_t &program, channel &inputs, channel &outputs) {
 static void run_program_thread(program_t program, channel &inputs,
                                channel &outputs) {
   run_program(program, inputs, outputs);
+  outputs.push_back(-1);
 }
 
 } // namespace aoc::intcode
