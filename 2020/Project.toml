@@ -1,0 +1,13 @@
+name = "AdventOfCode2020"
+uuid = "816cef53-7edd-4cf6-b4cb-d8c4302bbdec"
+authors = ["Joel Gustafsson <me@joelgustafsson.com> and contributors"]
+version = "0.1.0"
+
+[compat]
+julia = "1"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
