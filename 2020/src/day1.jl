@@ -20,11 +20,9 @@ function get_input()::Array{Int,1}
 end
 
 function solve_part_one(input::Array{Int,1})
-    for i in input
-        for j in input
-            if sums_to_2020(i, j)
-                return i * j
-            end
+    for (i, j) in Iterators.product(input, input)
+        if sums_to_2020(i, j)
+            return i * j
         end
     end
 
@@ -33,16 +31,13 @@ end
 
 
 function solve_part_two(input::Array{Int,1})
-    for i in input
-        for j in input
-            for k in input
-                if sums_to_2020(i, j, k)
-                    return i * j * k
-                end
-            end
+    for (i, j, k) in Iterators.product(input, input, input)
+        if sums_to_2020(i, j, k)
+            return i * j * k
         end
     end
-    -1
+
+    nothing
 end
 
 sums_to_2020(xs::Int...) = sum(xs) == 2020
