@@ -81,8 +81,8 @@ void input(program_t &program, size_t &program_pointer, size_t relative_base,
 
   while (inputs.empty()) {
     using namespace std::chrono_literals;
-//    std::cout << "Give input: " << std::endl;
-    //    std::cin >> val;
+//        std::cout << "Give input: " << std::endl;
+//        std::cin >> val;
     std::this_thread::sleep_for(10us);
   }
 
@@ -106,7 +106,7 @@ void output(program_t &program, size_t &program_pointer, size_t relative_base,
       get_address(program, program_pointer + 1, mode_c, relative_base);
 
   outputs.push_back(program[address_one]);
-  //  std::cout << program[address_one] << std::endl;
+//  std::cout << program[address_one] << std::endl;
   program_pointer += 2;
 }
 

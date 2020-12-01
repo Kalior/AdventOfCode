@@ -73,4 +73,13 @@ constexpr Position operator*(const Position &lhs, const Position &rhs) {
   auto [rhs_x, rhs_y] = rhs;
   return Position{lhs_x * rhs_x, lhs_y * rhs_y};
 }
+
+using Vector3D = std::tuple<int, int, int>;
+
+constexpr Vector3D operator+(const Vector3D &lhs, const Vector3D &rhs) {
+  auto [lhs_x, lhs_y, lhs_z] = lhs;
+  auto [rhs_x, rhs_y, rhs_z] = rhs;
+  return Vector3D{lhs_x + rhs_x, lhs_y + rhs_y, lhs_z + rhs_z};
+}
+
 }
