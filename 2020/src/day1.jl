@@ -1,3 +1,4 @@
+module Day1
 function solve()
     input = get_input()
 
@@ -41,3 +42,4 @@ function solve_part_two(input::Array{Int,1})
 end
 
 sums_to_2020(xs::Int...) = sum(xs) == 2020
+end
