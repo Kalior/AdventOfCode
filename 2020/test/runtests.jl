@@ -24,5 +24,9 @@ include("../src/day2.jl")
         @test Day2.valid_passphrase_two((1, 3, 'a', "abcde"))
         @test !Day2.valid_passphrase_two((1, 3, 'b', "cdefg"))
         @test !Day2.valid_passphrase_two((2, 9, 'c', "ccccccccc"))
+
+        input = Day2.get_input()
+        @test Day2.solve_part_one(input) == 625
+        @test Day2.solve_part_two(input) == 391
     end
 end

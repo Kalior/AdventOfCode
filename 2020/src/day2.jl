@@ -9,6 +9,10 @@ function get_input()::Array{Tuple{Int,Int,Char,String},1}
 
     open(input_path, "r") do f
         for line in readlines(f)
+            if line == ""
+                continue
+            end
+
             m = match(pattern, line)
             min = parse(Int, m[:min])
             max = parse(Int, m[:max])
@@ -37,20 +41,12 @@ end
 function valid_passphrase((min, max, char, passphrase)::Tuple{Int,Int,Char,String})
     occurrences = count(c -> (c == char), passphrase)
 
-    occurrences >= min && occurrences <= max
+    min <= occurrences <= max
 end
 
 
 function valid_passphrase_two((first, second, char, passphrase)::Tuple{Int,Int,Char,String})
-    occurrences = 0
-    if passphrase[first] == char
-        occurrences += 1
-    end
-    if passphrase[second] == char
-        occurrences += 1
-    end
-
-    return occurrences == 1
+    return sum(i -> passphrase[i] == char, [first, second]) == 1
 end
 
 end
