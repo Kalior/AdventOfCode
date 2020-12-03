@@ -1,10 +1,13 @@
 module InputHelper
 
 using HTTP
+import DotEnv
 
-session_cookie = ""
+cfg = DotEnv.config()
+session_cookie = cfg["AOC_SESSION"]
 
 root_url = "https://adventofcode.com/2020/day"
+
 function download(day::String)
     cookies = Dict("session" => session_cookie)
     fetch_url = "$root_url/$day/input"
@@ -18,6 +21,7 @@ function download(day::String)
     else
         println(r.status)
         println(String(r.body))
+        println("Do you have your session cookie (AOC_SESSION) in .env?")
     end
 end
 

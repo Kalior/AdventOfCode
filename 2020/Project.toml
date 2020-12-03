@@ -3,6 +3,10 @@ uuid = "816cef53-7edd-4cf6-b4cb-d8c4302bbdec"
 authors = ["Joel Gustafsson <me@joelgustafsson.com> and contributors"]
 version = "0.1.0"
 
+[deps]
+DotEnv = "4dc1fcf4-5e3b-5448-94ab-0c38ec0385c1"
+HTTP = "cd3eb016-35fb-5094-929b-558a96fad6f3"
+
 [compat]
 julia = "1"
 
