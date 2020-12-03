@@ -1,4 +1,7 @@
 module Day1
+
+include("InputHelper.jl")
+
 function solve()
     input = get_input()
 
@@ -8,16 +11,7 @@ function solve()
 end
 
 function get_input()::Array{Int,1}
-    input = []
-
-    input_path = joinpath(@__DIR__, "../inputs/day1")
-    open(input_path, "r") do f
-        for line in readlines(f)
-            push!(input, parse(Int, line))
-        end
-    end
-
-    input
+    InputHelper.parse("1", line -> parse(Int, line))
 end
 
 function solve_part_one(input::Array{Int,1})

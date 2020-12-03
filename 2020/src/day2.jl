@@ -1,24 +1,15 @@
 module Day2
 
+include("InputHelper.jl")
+
 function get_input()::Array{Tuple{Int,Int,Char,String},1}
-    input = []
-
-    input_path = joinpath(@__DIR__, "../inputs/day2")
-
     pattern = r"(?<min>\d+)-(?<max>\d+) (?<char>[a-z]): (?<passphrase>[a-z]+)"
 
-    open(input_path, "r") do f
-        for line in readlines(f)
-            if line == ""
-                continue
-            end
 
-            m = match(pattern, line)
-            min = parse(Int, m[:min])
-            max = parse(Int, m[:max])
-            push!(input, (min, max, first(m[:char]), m[:passphrase]))
-        end
-    end
+    input = InputHelper.parse("2", line -> begin
+        m = match(pattern, line)
+        (parse(Int, m[:min]), parse(Int, m[:max]), first(m[:char]), m[:passphrase])
+    end)
 
     input
 end
