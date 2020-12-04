@@ -49,11 +49,9 @@ end
 
 function valid_passport_with_security(passport::Dict{String,String})::Bool
 
-    fields = Dict("byr" => check_birthyear, "iyr" => check_issue_year, "eyr" => check_expire_year, "hgt" => check_height, "hcl" => check_colour, "ecl" => check_eyes, "pid" => check_pid) # "cid"
+    fields = Dict("byr" => check_birthyear, "iyr" => check_issue_year, "eyr" => check_expire_year, "hgt" => check_height, "hcl" => check_colour, "ecl" => check_eyes, "pid" => check_pid, "cid" => v -> true)
     for (key, value) in passport
-        if key == "cid"
-            continue
-        elseif !fields[key](value)
+        if !fields[key](value)
             return false
         end
     end
