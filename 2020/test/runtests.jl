@@ -3,6 +3,7 @@ using Test
 
 include("../src/day1.jl")
 include("../src/day2.jl")
+include("../src/day4.jl")
 
 @testset "AdventOfCode2020.jl" begin
     @testset "Day one" begin
@@ -28,5 +29,11 @@ include("../src/day2.jl")
         input = Day2.get_input()
         @test Day2.solve_part_one(input) == 625
         @test Day2.solve_part_two(input) == 391
+    end
+
+    @testset "Day four" begin
+        input = Day4.get_input()
+        @test Day4.solve_part_one(input) == 208
+        @test Day4.solve_part_two(input) == 167
     end
 end

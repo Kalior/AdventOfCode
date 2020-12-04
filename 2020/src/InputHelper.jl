@@ -3,12 +3,12 @@ module InputHelper
 using HTTP
 import DotEnv
 
-cfg = DotEnv.config()
-session_cookie = cfg["AOC_SESSION"]
-
-root_url = "https://adventofcode.com/2020/day"
 
 function download(day::String)
+    cfg = DotEnv.config()
+    session_cookie = cfg["AOC_SESSION"]
+    root_url = "https://adventofcode.com/2020/day"
+
     cookies = Dict("session" => session_cookie)
     fetch_url = "$root_url/$day/input"
     r = HTTP.get(fetch_url; cookies=cookies)
@@ -25,18 +25,14 @@ function download(day::String)
     end
 end
 
-function parse(day::String, f::Function)::Array{Any,1}
+function parse(f::Function, day::String, split_by::String="\n")::Array{Any,1}
     input_path = joinpath(@__DIR__, "../inputs/day$day")
     input = []
 
     open(input_path, "r") do io
-        for line in readlines(io)
-            if line == ""
-                continue
-            end
-            push!(input, f(line))
-        end
+        input = read(io, String)
     end
-    input
+
+    map(f, filter(chunk -> length(chunk) != 0, split(input, split_by)))
 end
 end

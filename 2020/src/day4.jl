@@ -5,24 +5,7 @@ include("InputHelper.jl")
 function get_input()::Array{Dict{String,String},1}
     pattern = r"(?<key>\S+):(?<value>\S+)"
 
-    passports = []
-
-    input_path = joinpath(@__DIR__, "../inputs/day4")
-
-    passport = Dict()
-    open(input_path, "r") do io
-        for line in readlines(io)
-            if line == ""
-                push!(passports, passport)
-                passport = Dict()
-            end
-            m = eachmatch(pattern, line)
-            for capture in m
-                passport[capture[:key]] = capture[:value]
-            end
-        end
-    end
-    passports
+    InputHelper.parse(line -> Dict(capture[:key] => capture[:value] for capture in eachmatch(pattern, line)), "4", "\n\n")
 end
 
 function solve()

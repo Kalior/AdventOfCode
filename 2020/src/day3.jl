@@ -3,7 +3,7 @@ module Day3
 include("InputHelper.jl")
 
 function get_input()::Array{String,1}
-    InputHelper.parse("3", line -> line)
+    InputHelper.parse(line -> line, "3")
 end
 
 function solve()

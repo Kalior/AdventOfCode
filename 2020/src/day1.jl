@@ -11,7 +11,7 @@ function solve()
 end
 
 function get_input()::Array{Int,1}
-    InputHelper.parse("1", line -> parse(Int, line))
+    InputHelper.parse(line -> parse(Int, line), "1")
 end
 
 function solve_part_one(input::Array{Int,1})

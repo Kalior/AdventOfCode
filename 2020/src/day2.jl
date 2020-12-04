@@ -6,10 +6,10 @@ function get_input()::Array{Tuple{Int,Int,Char,String},1}
     pattern = r"(?<min>\d+)-(?<max>\d+) (?<char>[a-z]): (?<passphrase>[a-z]+)"
 
 
-    input = InputHelper.parse("2", line -> begin
+    input = InputHelper.parse(line -> begin
         m = match(pattern, line)
         (parse(Int, m[:min]), parse(Int, m[:max]), first(m[:char]), m[:passphrase])
-    end)
+    end, "2")
 
     input
 end
