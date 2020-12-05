@@ -4,6 +4,7 @@ using Test
 include("../src/day1.jl")
 include("../src/day2.jl")
 include("../src/day4.jl")
+include("../src/day5.jl")
 
 @testset "AdventOfCode2020.jl" begin
     @testset "Day one" begin
@@ -35,5 +36,16 @@ include("../src/day4.jl")
         input = Day4.get_input()
         @test Day4.solve_part_one(input) == 208
         @test Day4.solve_part_two(input) == 167
+    end
+
+    @testset "Day five" begin
+        input = Day5.get_input()
+        @test Day5.get_pass_id("FBFBBFFRLR") == 357
+        @test Day5.get_pass_id("BFFFBBFRRR") == 567
+        @test Day5.get_pass_id("FFFBBBFRRR") == 119
+        @test Day5.get_pass_id("BBFFBBFRLL") == 820
+
+        @test Day5.solve_part_one(input) == 896
+        @test Day5.solve_part_two(input) == 659
     end
 end

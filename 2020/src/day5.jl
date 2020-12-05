@@ -9,7 +9,6 @@ function get_input()::Array{String,1}
 end
 
 function solve()
-
     input = get_input()
 
     println("Part one $(solve_part_one(input))")
@@ -28,34 +27,14 @@ function get_pass_id(pass::String)::Int
     row * 8 + col
 end
 
-function get_pass_row(pass::String)
-    upper_bound = 127
-    lower_bound = 0
-    for i in 1:7
-        size = (upper_bound - lower_bound + 1)
-        if pass[i] == 'B'
-            lower_bound += size / 2
-        elseif pass[i] == 'F'
-            upper_bound -= size / 2
-        end
-    end
-
-    upper_bound
+function get_pass_row(pass::String)::Int
+    str = map(c -> c ==  'F' ? '0' : '1', collect(pass[1:7]))
+    parse(Int, String(str), base=2)
 end
 
-function get_pass_col(pass::String)
-    upper_bound = 7
-    lower_bound = 0
-    for i in 8:10
-        size = (upper_bound - lower_bound + 1)
-        if pass[i] == 'R'
-            lower_bound += size / 2
-        elseif pass[i] == 'L'
-            upper_bound -= size / 2
-        end
-    end
-
-    upper_bound
+function get_pass_col(pass::String)::Int
+    str = map(c -> c ==  'L' ? '0' : '1', collect(pass[8:10]))
+    parse(Int, String(str), base=2)
 end
 
 function solve_part_two(boardingpasses::Array{String,1})
