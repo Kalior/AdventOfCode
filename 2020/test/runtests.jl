@@ -5,6 +5,7 @@ include("../src/day1.jl")
 include("../src/day2.jl")
 include("../src/day4.jl")
 include("../src/day5.jl")
+include("../src/day6.jl")
 
 @testset "AdventOfCode2020.jl" begin
     @testset "Day one" begin
@@ -47,5 +48,11 @@ include("../src/day5.jl")
 
         @test Day5.solve_part_one(input) == 896
         @test Day5.solve_part_two(input) == 659
+    end
+
+    @testset "Day six" begin
+        input = Day6.get_input()
+        @test Day6.solve_part_one(input) == 6703
+        @test Day6.solve_part_two(input) == 3430
     end
 end

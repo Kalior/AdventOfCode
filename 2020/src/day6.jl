@@ -30,7 +30,7 @@ function solve_part_two(input::Array{String,1})
 end
 
 function all_answered(group::String)::Int
-    length(intersect!([[c for c in line] for line in split(group, "\n") if line != ""]...))
+    length(intersect([[c for c in line] for line in split(group, "\n") if line != ""]...))
 end
 
 end
