@@ -33,6 +33,6 @@ function parse(f::Function, day::String, split_by::String="\n")::Array{Any,1}
         input = read(io, String)
     end
 
-    map(f, filter(chunk -> length(chunk) != 0, split(input, split_by)))
+    map(f, split(strip(input), split_by))
 end
 end
