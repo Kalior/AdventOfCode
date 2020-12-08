@@ -2,13 +2,14 @@ module Day8
 
 include("InputHelper.jl")
 
-function get_input()::Array{Tuple{String,Int},1}
+function get_input()::Array{Tuple{Symbol,Int},1}
     input = InputHelper.parse(line -> split(line, " "), "8", "\n")
 
-    [(op, parse(Int, v)) for (op, v) in input]
+    [(Symbol(op), parse(Int, v)) for (op, v) in input]
 end
 
 function solve()
+
     input = get_input()
 
     println("Part one $(solve_part_one(input))")
@@ -25,11 +26,11 @@ end
 function solve_part_two(input)
     for i in 1:length(input)
         (op, v) = input[i]
-        if op == "acc"
+        if op == :acc
             continue
         end
 
-        new_op = op == "jmp" ? "nop" : "jmp"
+        new_op = op == :jmp ? :nop : :jmp
         input[i] = (new_op, v)
 
         (acc, terminated) = execute_until_infinite(input)
@@ -59,12 +60,11 @@ function execute_until_infinite(input)
             return accumulator, false
         end
         push!(visited, ip)
-
         (op, v) = input[ip]
 
-        op_f = getfield(Day8, Symbol(op))
-
+        op_f = getfield(Day8, op)
         (accumulator, ip_offset) = op_f(v, accumulator)
+
         ip += ip_offset
     end
 
