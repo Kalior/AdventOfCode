@@ -2,12 +2,11 @@ module Day9
 
 include("InputHelper.jl")
 
-function get_input()
+function get_input()::Array{Int}
     InputHelper.parse(line -> parse(Int, line), "9")
 end
 
 function solve()
-
     input = get_input()
 
     println("Part one $(solve_part_one(input))")
@@ -15,7 +14,7 @@ function solve()
     println("Part two $(solve_part_two(input))")
 end
 
-function solve_part_one(input)
+function solve_part_one(input::Array{Int})::Int
     preamble = 25
     for i in (preamble + 1):length(input)
         n = input[i]
@@ -31,18 +30,17 @@ function solve_part_one(input)
 end
 
 
-function solve_part_two(input)
+function solve_part_two(input::Array{Int})::Int
     invalid_number = 1639024365
 
-    for i in 1:length(input)
-        rolling_sum = sum(input[i:i + 2])
-        for j in 3:(length(input) - i)
-            end_i = i + j
-            rolling_sum += input[end_i]
+    for start in 1:length(input)
+        rolling_sum = sum(input[start:start + 2])
+        for end_ in (start + 3):length(input)
+            rolling_sum += input[end_]
             if rolling_sum == invalid_number
-                min = minimum(input[i:end_i])
-                max = maximum(input[i:end_i])
-                println("min: $min, max: $max, block size: $j")
+                min = minimum(input[start:end_])
+                max = maximum(input[start:end_])
+                println("min: $min, max: $max, block size: $(end_ - start)")
                 return min + max
             elseif rolling_sum > invalid_number
                 break
