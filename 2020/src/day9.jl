@@ -35,13 +35,17 @@ function solve_part_two(input)
     invalid_number = 1639024365
 
     for i in 1:length(input)
+        rolling_sum = sum(input[i:i + 2])
         for j in 3:(length(input) - i)
             end_i = i + j
-            if sum(input[i:end_i]) == invalid_number
+            rolling_sum += input[end_i]
+            if rolling_sum == invalid_number
                 min = minimum(input[i:end_i])
                 max = maximum(input[i:end_i])
                 println("min: $min, max: $max, block size: $j")
                 return min + max
+            elseif rolling_sum > invalid_number
+                break
             end
         end
     end
