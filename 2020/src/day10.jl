@@ -49,7 +49,7 @@ function solve_part_two(input)
     fill!(ways_to_get_to_n, 0)
     ways_to_get_to_n[1] = 1
 
-    for i in 2:(length(input))
+    for i in 2:length(input)
         ways_to_get_to_i = 0
         for j in 0:min(3,  i - 1)
             if input[i - j] >= input[i] - 3
@@ -59,7 +59,7 @@ function solve_part_two(input)
         ways_to_get_to_n[i] = ways_to_get_to_i
     end
 
-    previous_ns[end]
+    ways_to_get_to_n[end]
 end
 
 
