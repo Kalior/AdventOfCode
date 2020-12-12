@@ -8,6 +8,8 @@ include("../src/day5.jl")
 include("../src/day6.jl")
 include("../src/day7.jl")
 include("../src/day8.jl")
+include("../src/day11.jl")
+include("../src/day12.jl")
 
 @testset "AdventOfCode2020.jl" begin
     @testset "Day one" begin
@@ -69,5 +71,17 @@ include("../src/day8.jl")
         input = Day8.get_input()
         @test Day8.solve_part_one(input) == 1451
         @test Day8.solve_part_two(input) == 1160
+    end
+
+    @testset "Day eleven" begin
+        input = Day11.get_input()
+        @test Day11.solve_part_one(input) == 2338
+        @test Day11.solve_part_two(input) == 2134
+    end
+
+    @testset "Day twelve" begin
+        input = Day12.get_input()
+        @test Day12.solve_part_one(input) == 521
+        @test Day12.solve_part_two(input) == 22848
     end
 end
