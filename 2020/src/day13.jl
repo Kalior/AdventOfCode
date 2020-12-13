@@ -42,7 +42,7 @@ function time_to_sequential(busses)
 
     end_  = 1000000000000000000000000000
 
-    periods = intersect([(buss - interval):buss:end_ for (buss, interval) in zip(real_busses, intervals)]...)
+    periods = intersect([-interval:buss:end_ for (buss, interval) in zip(real_busses, intervals)]...)
 
     # Check for validity, the first one really should be okay
     for period in periods
