@@ -10,6 +10,7 @@ include("../src/day7.jl")
 include("../src/day8.jl")
 include("../src/day11.jl")
 include("../src/day12.jl")
+include("../src/day13.jl")
 
 @testset "AdventOfCode2020.jl" begin
     @testset "Day one" begin
@@ -83,5 +84,14 @@ include("../src/day12.jl")
         input = Day12.get_input()
         @test Day12.solve_part_one(input) == 521
         @test Day12.solve_part_two(input) == 22848
+    end
+
+    @testset "Day thirteen" begin
+        @test Day13.time_to_sequential([17,nothing,13,19]) == 3417
+        @test Day13.time_to_sequential([67,7,59,61]) == 754018
+        @test Day13.time_to_sequential([67,nothing,7,59,61]) == 779210
+        @test Day13.time_to_sequential([67,7,nothing,59,61]) == 1261476
+        @test Day13.time_to_sequential([1789,37,47,1889]) == 1202161486
+        @test Day13.time_to_sequential([41,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,37,nothing,nothing,nothing,nothing,nothing,557,nothing,29,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,13,nothing,nothing,nothing,17,nothing,nothing,nothing,nothing,nothing,23,nothing,nothing,nothing,nothing,nothing,nothing,nothing,419,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,19]) == 598411311431841
     end
 end
