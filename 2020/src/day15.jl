@@ -42,10 +42,7 @@ function solve_part_two(input)
     current_turn = length(input)
 
     while current_turn < 30000000
-        # println(spoken)
         last_turn = get(spoken, current_number, current_turn)
-
-        # println("number $current_number, previously $last_turn, now $current_turn")
 
         spoken[current_number] = current_turn
         current_number = current_turn - last_turn
