@@ -23,15 +23,22 @@ end
 
 
 function play_game(numbers::Array{Int}, rounds::Int)
-    spoken = Dict(number => turn for (turn, number) in enumerate(numbers))
+    spoken = Array{Int}(undef, 30000000)
+    fill!(spoken, -1)
+    for (turn, number) in enumerate(numbers)
+        spoken[number + 1] = turn
+    end
 
     current_number = numbers[end]
     current_turn = length(numbers)
 
     while current_turn < rounds
-        last_turn = get(spoken, current_number, current_turn)
+        last_turn = spoken[current_number + 1]
+        if last_turn == -1
+            last_turn = current_turn
+        end
 
-        spoken[current_number] = current_turn
+        spoken[current_number + 1] = current_turn
 
         current_number = current_turn - last_turn
 
