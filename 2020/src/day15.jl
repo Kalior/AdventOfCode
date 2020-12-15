@@ -33,14 +33,14 @@ function play_game(numbers::Array{Int}, rounds::Int)
     current_turn = length(numbers)
 
     while current_turn < rounds
-        last_turn = spoken[current_number + 1]
-        if last_turn == -1
-            last_turn = current_turn
-        end
-
+        spoken_last = spoken[current_number + 1]
         spoken[current_number + 1] = current_turn
 
-        current_number = current_turn - last_turn
+        if spoken_last == -1
+            spoken_last = current_turn
+        end
+
+        current_number = current_turn - spoken_last
 
         current_turn += 1
     end
