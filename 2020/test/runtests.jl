@@ -11,6 +11,8 @@ include("../src/day8.jl")
 include("../src/day11.jl")
 include("../src/day12.jl")
 include("../src/day13.jl")
+include("../src/day16.jl")
+include("../src/day17.jl")
 
 @testset "AdventOfCode2020.jl" begin
     @testset "Day one" begin
@@ -93,5 +95,20 @@ include("../src/day13.jl")
         @test Day13.time_to_sequential([67,7,nothing,59,61]) == 1261476
         @test Day13.time_to_sequential([1789,37,47,1889]) == 1202161486
         @test Day13.time_to_sequential([41,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,37,nothing,nothing,nothing,nothing,nothing,557,nothing,29,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,13,nothing,nothing,nothing,17,nothing,nothing,nothing,nothing,nothing,23,nothing,nothing,nothing,nothing,nothing,nothing,nothing,419,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,nothing,19]) == 598411311431841
+    end
+
+    @testset "Day sixteen" begin
+        input = Day16.get_input()
+        @test Day16.solve_part_one(input) == 28884
+        @test Day16.solve_part_two(input) == 1001849322119
+    end
+
+    @testset "Day seventeen" begin
+        length(Day17.neighbour_states((1, 1, 1, 0), 3)) == 26
+        length(Day17.neighbour_states((1, 1, 1, 0), 4)) == 80
+
+        input = Day17.get_input()
+        @test Day17.solve_part_one(input) == 273
+        @test Day17.solve_part_two(input) == 1504
     end
 end
