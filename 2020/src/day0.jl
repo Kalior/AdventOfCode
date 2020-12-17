@@ -7,7 +7,6 @@ function get_input()::Array{String,1}
 end
 
 function solve()
-
     input = get_input()
 
     solve_part_one(input), solve_part_two(input)
