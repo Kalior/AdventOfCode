@@ -2,7 +2,7 @@ module Day19
 
 include("InputHelper.jl")
 
-function get_input()
+function get_input()::Tuple{Dict{Int,Rule},Array{String}}
     groups =  InputHelper.parse(line -> line, "19", "\n\n")
     split_rules = [split(rule, ": ") for rule in split(groups[1], "\n")]
     rules = Dict(parse(Int, idx) => parse_rule(rule) for (idx, rule) in split_rules)
@@ -12,7 +12,10 @@ function get_input()
     (rules, messages)
 end
 
-function parse_rule(rule)
+CharRule = Char
+OrRule = Array{Array{Int,1},1}
+Rule = Union{CharRule,OrRule}
+function parse_rule(rule::AbstractString)::Rule
     if rule == "\"a\""
         return 'a'
     elseif rule == "\"b\""
@@ -29,52 +32,47 @@ function solve()
     solve_part_one(input), solve_part_two(input)
 end
 
-function solve_part_one((rules, messages))
+function solve_part_one((rules, messages)::Tuple{Dict{Int,Rule},Array{String}})::Int
     n = 0
     for m in messages
-        matches, last_character_matched = matches_rule(m, 1, rules[0], rules)
-        if any(l == length(m) for l in last_character_matched) && matches
+        last_characters_matched = matches_rule(m, 1, rules[0], rules)
+        if any(l == length(m) for l in last_characters_matched) && length(last_characters_matched) != 0
             n += 1
         end
     end
     n
 end
 
-function matches_rule(message, idx,  rule, rules)
-    if idx > length(message)
-        return false, nothing
+
+function matches_rule(message::String, idx::Int, rule::CharRule, rules::Dict{Int,Rule})::Array{Int}
+    if idx > length(message) || message[idx] != rule
+        return []
+    elseif message[idx] == rule
+        return [idx]
     end
-
-    if rule == 'a' || rule == 'b'
-        return message[idx] == rule, [idx]
-    else
-        possible_subrules = (match_subrule(message, idx, subrule, rules) for subrule in rule)
-
-        all_matching_indicies = vcat([indicies for (match, indicies) in possible_subrules if match]...)
-
-        return length(all_matching_indicies) != 0, all_matching_indicies
-    end
-
-    false, nothing
 end
 
-function match_subrule(message, idx, subrule, rules)
-    sub_idxes = [idx - 1]
+function matches_rule(message::String, idx::Int, rule::OrRule, rules::Dict{Int,Rule})::Array{Int}
+    all_matching_indicies = vcat((match_subrule(message, idx, subrule, rules) for subrule in rule)...)
+
+    return all_matching_indicies
+end
+
+function match_subrule(message::String, idx::Int, subrule::Array{Int,1}, rules::Dict{Int,Rule})::Array{Int}
+    possible_matches = [idx - 1]
 
     for sub in subrule
-        possible_matches = (matches_rule(message, sub_idx + 1, rules[sub], rules) for sub_idx in sub_idxes)
+        possible_matches = vcat((matches_rule(message, sub_idx + 1, rules[sub], rules) for sub_idx in possible_matches)...)
 
-        sub_idxes = vcat([array for (match, array) in possible_matches if match]...)
-
-        if length(sub_idxes) == 0
-            return false, nothing
+        if length(possible_matches) == 0
+            return []
         end
     end
 
-    true, sub_idxes
+    possible_matches
 end
 
-function ugly_deal_with_repeats(rule_idx, rule)
+function ugly_deal_with_repeats(rule_idx::Int, rule::OrRule)::OrRule
     if length(rule) == 1
         return rule
     elseif !in(rule_idx, rule[2])
@@ -100,14 +98,14 @@ function ugly_deal_with_repeats(rule_idx, rule)
 
 end
 
-function solve_part_two((rules, messages))
+function solve_part_two((rules, messages)::Tuple{Dict{Int,Rule},Array{String}})::Int
     rules[8] = ugly_deal_with_repeats(8, parse_rule("42 | 42 8"))
     rules[11] = ugly_deal_with_repeats(11, parse_rule("42 31 | 42 11 31"))
     n = 0
     for m in messages
-        matches, last_character_matched = matches_rule(m, 1, rules[0], rules)
-        # println("$m $matches")
-        if any(l == length(m) for l in last_character_matched) && matches
+        last_characters_matched = matches_rule(m, 1, rules[0], rules)
+        # println("$m $(length(last_characters_matched) == 0)")
+        if any(l == length(m) for l in last_characters_matched) && length(last_characters_matched) != 0
             n += 1
         end
     end
