@@ -1,0 +1,16 @@
+name = "2021"
+uuid = "826ea714-388c-4fb2-920d-023240b68d79"
+authors = ["Joel Gustafsson <me@joelgustafsson.com> and contributors"]
+version = "0.1.0"
+
+[deps]
+DotEnv = "4dc1fcf4-5e3b-5448-94ab-0c38ec0385c1"
+
+[compat]
+julia = "1"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
