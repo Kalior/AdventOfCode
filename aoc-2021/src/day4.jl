@@ -7,7 +7,7 @@ include("ReadHelper.jl")
 
 
 function parse_input()
-    input = ReadHelper.getInputMap(f -> f, "4", "\n\n")
+    input::Array{String,1} = collect(ReadHelper.getInputMap(f -> f, "4", "\n\n"))
     numbers = map(n -> parse(Int, n), split(input[1], ","))
     boards = map(parse_board, input[2:end])
 
