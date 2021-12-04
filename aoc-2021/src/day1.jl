@@ -4,22 +4,19 @@ module Day1
 include("ReadHelper.jl")
 
 
-function parse()
+function parse_input()
     ReadHelper.getInput("1")
 end
 
 function solve()
-    input = parse()
+    input = parse_input()
 
-    println(solve_part_one(input))
-    println(solve_part_two(input))
+    (solve_part_one(input), solve_part_two(input))
 end
 
 function solve_part_one(input)
     n_increases = 0
     for (first, second) in zip(input, Iterators.drop(input, 1))
-        println(first)
-        println(second)
         if second > first
             n_increases += 1
         end

@@ -12,8 +12,7 @@ end
 function solve()
     input = parse_input()
 
-    println(solve_part_one(input))
-    println(solve_part_two(input))
+    (solve_part_one(input), solve_part_two(input))
 end
 
 function solve_part_one(input::Array{String,1})

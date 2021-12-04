@@ -24,15 +24,15 @@ function parse_line(line)
 end
 
 
-function parse()::Array{Instruction,1}
+function parse_input()::Array{Instruction,1}
     ReadHelper.getInputMap(parse_line, "2", "\n")
 end
 
 function solve()
-    input = parse()
+    input = parse_input()
 
-    println(solve_part_one(input))
-    println(solve_part_two(input))
+
+    (solve_part_one(input), solve_part_two(input))
 end
 
 function solve_part_one(input::Array{Instruction,1})
