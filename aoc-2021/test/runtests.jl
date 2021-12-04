@@ -28,5 +28,10 @@ include("../src/day4.jl")
         #@benchmark Day3.solve() setup = (input = Day3.parse_input())
     end
 
+    @testset "Day four" begin
+        numbers, boards = Day4.parse_input()
+        @test Day4.solve_part_one(boards, numbers) == (17, 45031)
+        @test Day4.solve_part_two(boards, numbers) == (87, 2568)
+        #@benchmark Day4.solve() setup = (input = Day4.parse_input())
     end
 end
