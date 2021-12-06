@@ -5,6 +5,8 @@ include("../src/day1.jl")
 include("../src/day2.jl")
 include("../src/day3.jl")
 include("../src/day4.jl")
+include("../src/day5.jl")
+include("../src/day6.jl")
 
 @testset "2021" begin
     @testset "Day one" begin
@@ -33,5 +35,19 @@ include("../src/day4.jl")
         @test Day4.solve_part_one(boards, numbers) == (17, 45031)
         @test Day4.solve_part_two(boards, numbers) == (87, 2568)
         #@benchmark Day4.solve() setup = (input = Day4.parse_input())
+    end
+
+    @testset "Day five" begin
+        input = Day5.parse_input()
+        @test Day5.solve_part_one(input) == 5169
+        @test Day5.solve_part_two(input) == 22083
+        #@benchmark Day5.solve() setup = (input = Day4.parse_input())
+    end
+
+    @testset "Day six" begin
+        fishes = Day6.parse_input()
+        @test Day6.solve_part_one(fishes) == 362346
+        @test Day6.solve_part_two(fishes) == 1639643057051
+        #@benchmark Day6.solve() setup = (input = Day6.parse_input())
     end
 end
