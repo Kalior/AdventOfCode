@@ -1,7 +1,4 @@
-
-
 module Day8
-using Statistics
 include("ReadHelper.jl")
 
 
