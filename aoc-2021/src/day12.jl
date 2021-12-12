@@ -41,18 +41,16 @@ function solve_part_one(connections)
     while !isempty(working_paths)
         path = pop!(working_paths)
 
-        all_continuations = connections[path[end]]
+        connected_caves = connections[path[end]]
 
-        for continuation in all_continuations
+        for cave in connected_caves
             new_path = copy(path)
-            push!(new_path, continuation)
+            push!(new_path, cave)
 
-            if continuation == "start"
+            if cave == "start" || filter_lower_case(cave, path)
                 continue
-            elseif continuation == "end"
+            elseif cave == "end"
                 push!(finished_paths, new_path)
-            elseif all(islowercase(c) for c in continuation) && continuation in path
-                continue
             else
                 push!(working_paths, new_path)
             end
@@ -70,22 +68,18 @@ function solve_part_two(connections)
     while !isempty(working_paths)
         (path, has_visited_small_cave_twice) = pop!(working_paths)
 
-        continuations = connections[path[end]]
+        connected_caves = connections[path[end]]
 
-        for continuation in continuations
+        for cave in connected_caves
             new_path = copy(path)
-            push!(new_path, continuation)
+            push!(new_path, cave)
 
-            if continuation == "start"
+            if cave == "start" || (filter_lower_case(cave, path) && has_visited_small_cave_twice)
                 continue
-            elseif continuation == "end"
+            elseif cave == "end"
                 push!(finished_paths, (new_path, has_visited_small_cave_twice))
-            elseif all(islowercase(c) for c in continuation) && continuation in path
-                if has_visited_small_cave_twice
-                    continue
-                else
-                    push!(working_paths, (new_path, true))
-                end
+            elseif filter_lower_case(cave, path) && !has_visited_small_cave_twice
+                push!(working_paths, (new_path, true))
             else
                 push!(working_paths, (new_path, has_visited_small_cave_twice))
             end
@@ -94,6 +88,8 @@ function solve_part_two(connections)
 
     length(finished_paths)
 end
+
+filter_lower_case(cave, path) = all(islowercase(c) for c in cave) && cave in path
 
 end
 
