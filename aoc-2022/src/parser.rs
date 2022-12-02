@@ -14,6 +14,7 @@ pub mod parser {
             .expect("something went wrong reading the file");
         contents
             .split(split_by)
+            .filter(|l| l.len() > 0)
             .map(fun)
             .collect()
     }
