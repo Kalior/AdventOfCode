@@ -60,7 +60,7 @@ fn result_to_score(res: Results) -> i32 {
 pub fn solve() {
     let input = parse();
     solve1(input);
-    let input_2 = parse_2();
+    let input_2 = parse_strategy();
     solve2(input_2);
 }
 
@@ -82,7 +82,7 @@ fn parse_line(line: &str) -> (Hands, Results) {
     (hand, result)
 }
 
-fn parse_2() -> Vec<(Hands, Results)> {
+fn parse_strategy() -> Vec<(Hands, Results)> {
     parser::parse(2, "\n", parse_line)
 }
 
@@ -136,7 +136,7 @@ fn use_strategy(result_pair: (Hands, Results)) -> i32 {
 }
 
 fn solve1(input: Vec<(Hands, Hands)>) -> i32 {
-    input.into_iter().map(|hand_pair| score_result(hand_pair[0], hand_pair[1])).sum()
+    input.into_iter().map(|hand_pair| score_result(hand_pair.0, hand_pair.1)).sum()
 }
 
 fn solve2(input: Vec<(Hands, Results)>) -> i32 {
@@ -155,7 +155,7 @@ mod tests {
 
     #[test]
     fn part_two_test() {
-        let input = parse_2();
+        let input = parse_strategy();
         assert_eq!(solve2(input), 13490);
     }
 }
