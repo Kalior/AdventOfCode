@@ -1,5 +1,5 @@
-use std::collections::HashSet;
 use crate::parser::parser;
+use std::collections::HashSet;
 
 type Input = Vec<String>;
 
@@ -15,25 +15,23 @@ fn parse() -> Input {
     parser::parse(6, "", |c| c.to_string())
 }
 
-fn solve1(input: Input) -> usize {
-    for i in 3..input.len() {
-        let potential_marker = &input[i-3..=i];
-        if HashSet::<&String>::from_iter(potential_marker).len() == 4 {
-            return i + 1;
-        }
+fn index_of_first_window_with_all_unique_chars(input: Input, window_size: usize) -> usize {
+    input
+        .as_slice()
+        .windows(window_size)
+        .enumerate()
+        .filter(|(_, window)| HashSet::<&String>::from_iter(*window).len() == window_size)
+        .map(|(i, _)| i + window_size)
+        .next()
+        .unwrap_or_default()
+}
 
-    }
-    0
+fn solve1(input: Input) -> usize {
+    index_of_first_window_with_all_unique_chars(input, 4)
 }
 
 fn solve2(input: Input) -> usize {
-    for i in 13..input.len() {
-        let potential_marker = &input[i-13..=i];
-        if HashSet::<&String>::from_iter(potential_marker).len() == 14 {
-            return i + 1;
-        }
-    }
-    0
+    index_of_first_window_with_all_unique_chars(input, 14)
 }
 
 #[cfg(test)]
