@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use crate::parser::parser;
 
 #[derive(Eq, PartialEq, Hash)]
@@ -8,7 +6,7 @@ struct Pos {
     y: usize,
 }
 
-type Trees = HashMap<Pos, usize>;
+type Trees = Vec<Vec<usize>>;
 
 pub fn solve() {
     let input = parse();
@@ -24,83 +22,75 @@ fn parse() -> Trees {
             .map(|c| c.to_string().parse::<usize>().unwrap())
             .collect::<Vec<usize>>()
     });
-
-    let mut hashmap = HashMap::new();
-    for (y, line) in lines.iter().enumerate() {
-        for (x, height) in line.iter().enumerate() {
-            hashmap.insert(Pos { x, y }, *height);
-        }
-    }
-
-    hashmap
+    lines
 }
 
 fn is_visible_from_left(pos: &Pos, trees: &Trees) -> bool {
-    let height = trees[pos];
-    (0..pos.x).all(|x| trees[&Pos { x, y: pos.y }] < height)
+    let height = trees[pos.y][pos.x];
+    (0..pos.x).all(|x| trees[pos.y][x] < height)
 }
-fn is_visible_from_right(pos: &Pos, trees: &Trees, max_x: usize) -> bool {
-    let height = trees[pos];
-    (pos.x + 1..=max_x).all(|x| trees[&Pos { x, y: pos.y }] < height)
+fn is_visible_from_right(pos: &Pos, trees: &Trees) -> bool {
+    let height = trees[pos.y][pos.x];
+    (pos.x + 1..trees[pos.y].len()).all(|x| trees[pos.y][x] < height)
 }
 fn is_visible_from_up(pos: &Pos, trees: &Trees) -> bool {
-    let height = trees[pos];
-    (0..pos.y).all(|y| trees[&Pos { x: pos.x, y }] < height)
+    let height = trees[pos.y][pos.x];
+    (0..pos.y).all(|y| trees[y][pos.x] < height)
 }
-fn is_visible_from_down(pos: &Pos, trees: &Trees, max_y: usize) -> bool {
-    let height = trees[pos];
-    (pos.y + 1..=max_y).all(|y| trees[&Pos { x: pos.x, y }] < height)
+fn is_visible_from_down(pos: &Pos, trees: &Trees) -> bool {
+    let height = trees[pos.y][pos.x];
+    (pos.y + 1..trees.len()).all(|y| trees[y][pos.x] < height)
 }
 
 fn is_visible(pos: &Pos, trees: &Trees) -> bool {
-    let max_x = trees.keys().map(|p| p.x).max().unwrap();
-    let max_y = trees.keys().map(|p| p.y).max().unwrap();
+    let max_x = trees[pos.y].len();
+    let max_y = trees.len();
 
     if pos.x == 0 || pos.y == 0 || pos.x == max_x || pos.y == max_y {
         return true;
     }
 
     return is_visible_from_left(pos, trees)
-        || is_visible_from_right(pos, trees, max_x)
+        || is_visible_from_right(pos, trees)
         || is_visible_from_up(pos, trees)
-        || is_visible_from_down(pos, trees, max_y);
+        || is_visible_from_down(pos, trees);
 }
 
 fn scenic_score(pos: &Pos, trees: &Trees) -> usize {
-    let height = trees[pos];
+    let height = trees[pos.y][pos.x];
 
-    let max_x = trees.keys().map(|p| p.x).max().unwrap();
-    let max_y = trees.keys().map(|p| p.y).max().unwrap();
+    let max_x = trees[pos.y].len();
+    let max_y = trees.len();
 
     let mut left_scenic = (0..pos.x)
         .rev()
-        .take_while(|x| trees[&Pos { x: *x, y: pos.y }] < height)
+        .take_while(|x| trees[pos.y][*x] < height)
         .count()
         + 1;
-    let mut right_scenic = (pos.x + 1..=max_x)
-        .take_while(|x| trees[&Pos { x: *x, y: pos.y }] < height)
+    let mut right_scenic = (pos.x + 1..max_x)
+        .take_while(|x| trees[pos.y][*x] < height)
         .count()
         + 1;
     let mut up_scenic = (0..pos.y)
         .rev()
-        .take_while(|y| trees[&Pos { x: pos.x, y: *y }] < height)
+        .take_while(|y| trees[*y][pos.x] < height)
         .count()
         + 1;
-    let mut down_scenic = (pos.y + 1..=max_y)
-        .take_while(|y| trees[&Pos { x: pos.x, y: *y }] < height)
+    let mut down_scenic = (pos.y + 1..max_y)
+        .take_while(|y| trees[*y][pos.x] < height)
         .count()
         + 1;
 
     if is_visible_from_left(pos, trees) {
         left_scenic -= 1
     }
-    if is_visible_from_right(pos, trees, max_x) {
+    if is_visible_from_right(pos, trees) {
         right_scenic -= 1
     }
     if is_visible_from_up(pos, trees) {
         up_scenic -= 1
     }
-    if is_visible_from_down(pos, trees, max_y) {
+    if is_visible_from_down(pos, trees) {
         down_scenic -= 1
     }
 
@@ -108,13 +98,29 @@ fn scenic_score(pos: &Pos, trees: &Trees) -> usize {
 }
 
 fn solve1(trees: &Trees) -> usize {
-    trees.keys().filter(|pos| is_visible(pos, trees)).count()
+    trees
+        .iter()
+        .enumerate()
+        .map(|(y, vals)| {
+            vals.iter()
+                .enumerate()
+                .filter(|(x, _)| is_visible(&Pos { x: *x, y: y }, trees))
+                .count()
+        })
+        .sum()
 }
 
 fn solve2(trees: &Trees) -> usize {
     trees
-        .keys()
-        .map(|pos| scenic_score(pos, trees))
+        .iter()
+        .enumerate()
+        .map(|(y, vals)| {
+            vals.iter()
+                .enumerate()
+                .map(|(x, _)| scenic_score(&Pos { x: x, y: y }, trees))
+                .max()
+                .unwrap()
+        })
         .max()
         .unwrap()
 }
