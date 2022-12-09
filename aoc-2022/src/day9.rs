@@ -74,14 +74,13 @@ fn move_rope(knots_pos: &mut Vec<Pos>, action: (Dir, usize), visited: &mut HashS
     let n_moves = action.1;
 
     for _ in 0..n_moves {
-        let &mut mut head_pos = knots_pos.first_mut().unwrap();
+        let mut head_pos = knots_pos.first_mut().unwrap();
         match action.0 {
             Dir::Up => head_pos.y -= 1,
             Dir::Down => head_pos.y += 1,
             Dir::Left => head_pos.x -= 1,
             Dir::Right => head_pos.x += 1,
         }
-        knots_pos[0] = head_pos;
 
         for i in 1..knots_pos.len() {
             let (left, right) = knots_pos.split_at_mut(i);
