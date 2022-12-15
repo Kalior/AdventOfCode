@@ -7,6 +7,10 @@ pub mod parser {
     }
 
     pub fn parse<T>(day: i32, split_by: &str, fun: fn(&str) -> T) -> Vec<T> {
+        parse_str(&day.to_string(), split_by, fun)
+    }
+
+    pub fn parse_str<T>(day: &str, split_by: &str, fun: fn(&str) -> T) -> Vec<T> {
         let filename = format!("input/day{day}input");
         let mut f = File::open(filename).expect("file not found");
         let mut contents = String::new();
