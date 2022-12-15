@@ -156,13 +156,11 @@ fn solve2(sensor_readings: Input) -> i64 {
         .step_by(step_size as usize)
         .collect::<Vec<i64>>();
 
-    *y_ranges
+    y_ranges
         .par_iter()
         .progress_count(y_ranges.len() as u64)
         .map(|&y| check_y_value(&sensor_readings, y))
-        .filter(|&v| v != -1)
-        .collect::<Vec<i64>>()
-        .get(0)
+        .find_any(|&v| v != -1)
         .unwrap()
 }
 
