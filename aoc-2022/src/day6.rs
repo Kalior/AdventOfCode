@@ -1,3 +1,5 @@
+extern crate test;
+
 use crate::parser::parser;
 use std::collections::HashSet;
 
@@ -37,6 +39,7 @@ fn solve2(input: Input) -> usize {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use test::Bencher;
 
     fn to_input(string: &str) -> Input {
         string.chars().map(|c| c.to_string()).collect()
@@ -61,5 +64,11 @@ mod tests {
         assert_eq!(solve2(to_input("nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg")), 29);
         assert_eq!(solve2(to_input("zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw")), 26);
         assert_eq!(solve2(input), 2508);
+    }
+
+    #[bench]
+    fn bench_one(b: &mut Bencher) {
+        let input = parse();
+        b.iter(|| solve1(input.to_vec()));
     }
 }

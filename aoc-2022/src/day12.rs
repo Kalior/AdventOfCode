@@ -21,6 +21,28 @@ fn parse() -> Input {
     parser::parse(12, "\n", |line| line.chars().collect())
 }
 
+fn is_climbable(current_height: char, new_height: char) -> bool {
+    let mut test_height = new_height;
+    let mut current_height = current_height;
+
+    if current_height == 'E' {
+        current_height = 'z';
+    } else if current_height == 'S' {
+        current_height = 'a';
+    }
+
+    if test_height == 'E' {
+        test_height = 'z';
+    } else if test_height == 'S' {
+        test_height = 'a';
+    }
+
+    let test_height = test_height as u8;
+    let current_height: u8 = current_height as u8;
+
+    return current_height + 1 >= test_height;
+}
+
 fn new_path_if_climable(
     test_p: Pos,
     current_height: char,
@@ -28,20 +50,7 @@ fn new_path_if_climable(
     new_paths: &mut Vec<Path>,
     heightmap: &Input,
 ) {
-    let mut test_height = heightmap[test_p.y][test_p.x];
-
-    if test_height == 'E' {
-        test_height = 'z';
-    } else if test_height == 'S' {
-        test_height = 'a';
-    }
-    //print!("{}, {} :", current_height, test_height);
-
-    let test_height = test_height as u8;
-    let current_height: u8 = current_height as u8;
-
-    //println!("{}",current_height + 1 >= test_height);
-    if current_height + 1 >= test_height {
+    if is_climbable(current_height, heightmap[test_p.y][test_p.x]) {
         let mut new_path = path.clone();
         new_path.push(test_p);
         new_paths.push(new_path);
@@ -67,12 +76,10 @@ fn walk_path(start_pos: Pos, heightmap: &Input) -> usize {
                 continue;
             }
 
-            let mut current_height = heightmap[p.y][p.x];
+            let current_height = heightmap[p.y][p.x];
 
             if current_height == 'E' {
                 return path.len() - 1;
-            } else if current_height == 'S' {
-                current_height = 'a';
             }
 
             let up_pos = Pos {

@@ -1,6 +1,7 @@
 use crate::parser::parser;
 use std::cmp::{max, min};
 use std::collections::HashMap;
+use std::{thread, time};
 
 type Input = HashMap<Pos, Fill>;
 
@@ -21,8 +22,8 @@ pub fn solve() {
     let input = parse();
     let one = solve1(&input);
     println!("Part one: {}", one);
-    let two = solve2(&input);
-    println!("Part two: {}", two);
+    //let two = solve2(&input);
+    //println!("Part two: {}", two);
 }
 
 fn to_pos(pair: &str) -> Pos {
@@ -140,7 +141,6 @@ fn add_sand(cave: &mut Input, max_y: usize) -> Pos {
 fn solve1(cave: &Input) -> i32 {
     let mut cave = cave.clone();
 
-    let min_y = cave.keys().map(|p| p.y).min().unwrap();
     let min_x = cave.keys().map(|p| p.x).min().unwrap();
 
     let max_y = cave.keys().map(|p| p.y).max().unwrap();
@@ -155,6 +155,9 @@ fn solve1(cave: &Input) -> i32 {
         }
         n_sands += 1;
         //print_cave(&mut cave, min_y, min_x, max_y, max_x);
+        print!("\x1B[2J\x1B[1;1H");
+        print_cave(&mut cave, 0, min_x - 5, max_y + 3, max_x + 5);
+        thread::sleep(time::Duration::from_millis(10));
     }
     print_cave(&mut cave, 0, min_x - 5, max_y + 3, max_x + 5);
 
@@ -185,7 +188,6 @@ fn print_cave(
 fn solve2(cave: &Input) -> i32 {
     let mut cave = cave.clone();
 
-    let min_y = cave.keys().map(|p| p.y).min().unwrap();
     let min_x = cave.keys().map(|p| p.x).min().unwrap();
 
     let max_y = cave.keys().map(|p| p.y).max().unwrap();

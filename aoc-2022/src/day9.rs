@@ -29,8 +29,8 @@ type Input = Vec<(Dir, usize)>;
 
 pub fn solve() {
     let input = parse();
-    let one = solve1(input.to_vec());
-    println!("Part one: {}", one);
+    //let one = solve1(input.to_vec());
+    //println!("Part one: {}", one);
     let two = solve2(input.to_vec());
     println!("Part two: {}", two);
 }
