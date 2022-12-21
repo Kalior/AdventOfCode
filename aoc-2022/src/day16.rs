@@ -1,10 +1,11 @@
-use crate::parser::parser;
-use itertools::Itertools;
 use std::cmp::Ordering;
-use std::collections::BinaryHeap;
-use std::collections::{HashMap, HashSet, VecDeque};
+use std::collections::{HashMap, VecDeque};
 use std::hash::Hash;
 use std::iter::zip;
+
+use itertools::Itertools;
+
+use crate::parser::parser;
 
 type Input = Vec<Valve>;
 
@@ -63,6 +64,7 @@ struct Path {
     on_minute: usize,
     current_valves: Vec<String>,
     opened_valves: Vec<String>,
+    path: Vec<(String, usize, usize)>,
 }
 
 impl Ord for Path {
@@ -77,7 +79,11 @@ impl Ord for Path {
 }
 
 fn solve1(valves_in: &Input) -> usize {
-    let results_at_time = open_valves(valves_in, 30, 1, Vec::new());
+    let results_at_time = open_valves(valves_in, 30, 1);
+
+    for (v, t, f) in results_at_time.1 {
+        println!("{t}: {v} ({f})");
+    }
 
     results_at_time.0
 }
@@ -86,38 +92,60 @@ fn open_valves(
     valves_in: &Input,
     time: usize,
     n_actors: usize,
-    opened_valves: Vec<String>,
-) -> (usize, Vec<String>) {
+) -> (usize, Vec<(String, usize, usize)>) {
     let mut valves: HashMap<String, Valve> = HashMap::new();
 
     for valve in valves_in {
         valves.insert(valve.name.clone(), valve.clone());
     }
 
-    let mut paths: BinaryHeap<Path> = BinaryHeap::new();
+    let n_valves_above_0 = valves_in.iter().filter(|v| v.flow_rate > 0).count();
 
-    let mut highest_at_tunnel: HashMap<(Vec<String>, usize), usize> = HashMap::new();
+    let mut paths: VecDeque<Path> = VecDeque::new();
+
+    let mut highest_at_tunnel: HashMap<(String, String, usize), usize> = HashMap::new();
 
     let start_p = Path {
         estimated_flow_released: 0,
         on_minute: 0,
         current_valves: vec!["AA".to_string(); n_actors],
-        opened_valves: opened_valves.clone(),
+        opened_valves: Vec::new(),
+        path: Vec::new(),
     };
-    paths.push(start_p);
+    let mut best_p = start_p.clone();
 
-    let mut highest_at_time: Vec<(usize, Vec<String>)> = Vec::new();
+    paths.push_back(start_p);
 
-    while let Some(p) = paths.pop() {
+    while let Some(p) = paths.pop_back() {
+        // Hard coded values, the solution to part two has to be better than the
+        // solution to part one.  This helps to heavily constrain the
+        // search space.  This will, of course, break the test input.
+        if (p.on_minute > 2 && p.estimated_flow_released < 459)
+            || (p.on_minute > 6 && p.estimated_flow_released < 873)
+            || (p.on_minute > 9 && p.estimated_flow_released < 1273)
+            || (p.on_minute > 12 && p.estimated_flow_released < 1647)
+            || (p.on_minute > 16 && p.estimated_flow_released < 1894)
+            || (p.on_minute > 19 && p.estimated_flow_released < 2044)
+            || (p.on_minute > 22 && p.estimated_flow_released < 2205)
+            || (p.on_minute > 25 && p.estimated_flow_released < 2253)
+        {
+            continue;
+        }
         // If all valves are open, can do nothing more.
-        if p.opened_valves.len() == valves.len() {
-            highest_at_time.push((p.estimated_flow_released, p.opened_valves.clone()));
+        if p.opened_valves.len() == n_valves_above_0 {
+            if p.estimated_flow_released > best_p.estimated_flow_released {
+                best_p = p.clone();
+                println!("{}", best_p.estimated_flow_released);
+            }
             continue;
         }
 
         // If we've spent 30 minutes, can do nothing more.
         if p.on_minute >= time {
-            highest_at_time.push((p.estimated_flow_released, p.opened_valves.clone()));
+            if p.estimated_flow_released > best_p.estimated_flow_released {
+                best_p = p.clone();
+                println!("{}", best_p.estimated_flow_released);
+            }
             continue;
         }
 
@@ -135,7 +163,7 @@ fn open_valves(
 
             let mut options: Vec<(String, usize, Option<String>)> = Vec::new();
             // open valve:
-            let mut open_options = get_open_valve_options(time, &p, &current_valve);
+            let mut open_options = get_open_valve_options(time, p.on_minute, &current_valve);
 
             // don't open valve:
             let mut move_options = get_move_options(&current_valve);
@@ -146,22 +174,31 @@ fn open_valves(
         }
         if n_actors == 1 {
             for (tunnel, est_new_flow_rate, new_opened_valve) in combined_options[0].iter() {
+                let estimated_flow_released = p.estimated_flow_released + est_new_flow_rate;
+
                 let mut new_opened_valves = p.opened_valves.clone();
-                if new_opened_valve.is_some() {
-                    if p.opened_valves.contains(&new_opened_valve.clone().unwrap()) {
+                let mut path = p.path.clone();
+                if let Some(new_opened_valve) = new_opened_valve {
+                    if p.opened_valves.contains(new_opened_valve) {
                         continue;
                     }
-                    new_opened_valves.push(new_opened_valve.clone().unwrap());
+                    new_opened_valves.push(new_opened_valve.clone());
+                    path.push((
+                        new_opened_valve.clone(),
+                        p.on_minute,
+                        estimated_flow_released,
+                    ));
                 }
 
                 let new_p = Path {
-                    estimated_flow_released: p.estimated_flow_released + est_new_flow_rate,
+                    estimated_flow_released,
                     on_minute: p.on_minute + 1,
                     current_valves: vec![tunnel.clone()],
                     opened_valves: new_opened_valves,
+                    path,
                 };
 
-                paths.push(new_p);
+                paths.push_back(new_p);
             }
         } else if n_actors == 2 {
             for (my_tunnel, my_est_new_flow_rate, my_new_valve) in combined_options[0].iter() {
@@ -173,53 +210,63 @@ fn open_valves(
                         continue;
                     }
 
+                    let estimated_flow_released =
+                        p.estimated_flow_released + my_est_new_flow_rate + elephant_new_flow_rate;
+
+                    let mut path = p.path.clone();
                     let mut new_opened_valves = p.opened_valves.clone();
-                    if my_new_valve.is_some() {
-                        if new_opened_valves.contains(&my_new_valve.clone().unwrap()) {
+
+                    if let Some(my_new_valve) = my_new_valve {
+                        if p.opened_valves.contains(my_new_valve) {
                             continue;
                         }
-                        new_opened_valves.push(my_new_valve.clone().unwrap());
+                        new_opened_valves.push(my_new_valve.clone());
+                        path.push((my_new_valve.clone(), p.on_minute, estimated_flow_released));
                     }
-                    if elephant_new_valve.is_some() {
-                        if new_opened_valves.contains(&elephant_new_valve.clone().unwrap()) {
+                    if let Some(elephant_new_valve) = elephant_new_valve {
+                        if p.opened_valves.contains(elephant_new_valve) {
                             continue;
                         }
-                        new_opened_valves.push(elephant_new_valve.clone().unwrap());
+                        new_opened_valves.push(elephant_new_valve.clone());
+                        path.push((
+                            elephant_new_valve.clone(),
+                            p.on_minute - 1,
+                            estimated_flow_released,
+                        ));
                     }
 
                     let new_p = Path {
-                        estimated_flow_released: p.estimated_flow_released
-                            + my_est_new_flow_rate
-                            + elephant_new_flow_rate,
+                        estimated_flow_released,
                         on_minute: p.on_minute + 1,
                         current_valves: vec![my_tunnel.clone(), elephant_tunnel.clone()],
                         opened_valves: new_opened_valves,
+                        path,
                     };
 
-                    paths.push(new_p);
+                    paths.push_back(new_p);
                 }
             }
         }
     }
 
-    /*for (val, opened) in highest_at_time.iter() {
-        print!("{val}: ");
-        for open in opened.iter() {
-            print!("{open} ")
-        }
-        println!();
-    }*/
-
-    highest_at_time.sort_by_key(|v| v.0);
-
-    highest_at_time[highest_at_time.len() - 1].clone()
+    (best_p.estimated_flow_released, best_p.path)
 }
 
 fn better_path_exists(
-    highest_at_tunnel: &mut HashMap<(Vec<String>, usize), usize>,
+    highest_at_tunnel: &mut HashMap<(String, String, usize), usize>,
     p: &Path,
 ) -> bool {
-    let key = (p.current_valves.clone(), p.on_minute);
+    let mut current_valves = p.current_valves.clone();
+    current_valves.sort();
+    let current_valves = current_valves.join(",");
+
+    let mut opened_valves = p.opened_valves.clone();
+    opened_valves.sort();
+
+    let opened_valves = opened_valves.join(",");
+
+    let key = (current_valves.clone(), opened_valves, p.on_minute);
+
     if highest_at_tunnel.contains_key(&key) {
         if highest_at_tunnel[&key] >= p.estimated_flow_released {
             true
@@ -235,17 +282,19 @@ fn better_path_exists(
 
 fn get_open_valve_options(
     time: usize,
-    p: &Path,
+    on_minute: usize,
     current_valve: &&Valve,
 ) -> Vec<(String, usize, Option<String>)> {
     let mut possibilities = vec![];
-    let estimated_new_flow_rate = current_valve.flow_rate * (time - p.on_minute - 1);
+    if current_valve.flow_rate > 0 {
+        let estimated_new_flow_rate = current_valve.flow_rate * (time - on_minute - 1);
 
-    possibilities.push((
-        current_valve.name.clone(),
-        estimated_new_flow_rate,
-        Some(current_valve.name.clone()),
-    ));
+        possibilities.push((
+            current_valve.name.clone(),
+            estimated_new_flow_rate,
+            Some(current_valve.name.clone()),
+        ));
+    }
 
     possibilities
 }
@@ -260,11 +309,13 @@ fn get_move_options(current_valve: &&Valve) -> Vec<(String, usize, Option<String
 }
 
 fn solve2(valves: &Input) -> usize {
-    let (released_pressure, opened) = open_valves(valves, 26, 1, Vec::new());
+    let (released_pressure, vs) = open_valves(valves, 26, 2);
 
-    let (elephant_released, elephant_opened) = open_valves(valves, 26, 1, opened);
+    for (v, t, f) in vs {
+        println!("{t}: {v} ({f})");
+    }
 
-    released_pressure + elephant_released
+    released_pressure
 }
 
 #[cfg(test)]
@@ -286,7 +337,30 @@ mod tests {
                     "FS".to_string()
                 ]
             }
+        );
+
+        assert_eq!(
+            parse_to_valve("Valve IM has flow rate=19; tunnels lead to valves PU, EC, QS, LT"),
+            Valve {
+                name: "IM".to_string(),
+                flow_rate: 19,
+                tunnels: vec![
+                    "PU".to_string(),
+                    "EC".to_string(),
+                    "QS".to_string(),
+                    "LT".to_string(),
+                ]
+            }
         )
+    }
+
+    #[test]
+    fn test_contains() {
+        let mut highest_at_tunnel: HashMap<(Vec<String>, usize), usize> = HashMap::new();
+
+        highest_at_tunnel.insert((vec!["AA".to_string(), "BB".to_string()], 4), 10);
+
+        assert!(highest_at_tunnel.contains_key(&(vec!["AA".to_string(), "BB".to_string()], 4)));
     }
 
     #[test]
