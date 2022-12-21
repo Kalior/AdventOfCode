@@ -1,9 +1,5 @@
 use std::cmp::Ordering;
 use std::collections::{HashMap, VecDeque};
-use std::hash::Hash;
-use std::iter::zip;
-
-use itertools::Itertools;
 
 use crate::parser::parser;
 
@@ -230,7 +226,7 @@ fn open_valves(
                         new_opened_valves.push(elephant_new_valve.clone());
                         path.push((
                             elephant_new_valve.clone(),
-                            p.on_minute - 1,
+                            p.on_minute,
                             estimated_flow_released,
                         ));
                     }
