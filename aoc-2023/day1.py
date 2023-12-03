@@ -7,7 +7,7 @@ def parse_input() -> list[str]:
     with p.open("r") as f:
         input = f.read()
 
-    return input.splitlines(keepends=False)
+    return input.splitlines()
 
 
 def _parse_int(integer: str) -> int:
@@ -53,7 +53,7 @@ def _parse_calibration(line: str, pattern: re.Pattern) -> int:
         else:
             second = second_match[0]
 
-        return int(f"{_parse_int(first_match)}{_parse_int(second)}")
+        return _parse_int(first_match) * 10 + _parse_int(second)
 
 
 def solve():
