@@ -1,12 +1,8 @@
 from pathlib import Path
 import numpy as np
 from dataclasses import dataclass
-from itertools import islice
 
-import seaborn as sns
-import matplotlib.pyplot as plt
 from more_itertools import ichunked
-from tqdm import tqdm
 
 
 @dataclass
@@ -67,8 +63,7 @@ def solve_2(seeds_and_maps: tuple[list[str], list[Map]]):
     seeds, maps = seeds_and_maps
 
     range_seeds = [
-        (seed_start, seed_start + length)
-        for seed_start, length in tqdm(ichunked(seeds, 2))
+        (seed_start, seed_start + length) for seed_start, length in ichunked(seeds, 2)
     ]
 
     rng = np.random.default_rng()
@@ -76,33 +71,39 @@ def solve_2(seeds_and_maps: tuple[list[str], list[Map]]):
         [v for start, end in range_seeds for v in rng.integers(start, end, 1000)]
     )
 
-    min_v = 99999999999999
-    globlal_min = 0
-    same_for_idx = 0
-    while same_for_idx < 10:
-        converted = np.array([_convert(seed, maps) for seed in some_seeds])
-        globlal_min = min_v
-        min_v = min(list(converted) + [globlal_min])
+    min_v = np.inf
+    old_min = 0
 
-        min_idx = converted.argsort()[:5]
+    same_min_for_i = 0
+    while same_min_for_i < 10:
+        # Apply conversion to subset of seeds
+        converted = np.array([_convert(seed, maps) for seed in some_seeds])
+
+        # Update smallest as-yet found values
+        old_min = min_v
+        min_v = min(list(converted) + [old_min])
         print(min_v)
 
+        # Resample `some_seeds` from around where we found the smallest values
+        min_idx = converted.argsort()[:5]
         some_seeds = np.array(
             [
                 v
                 for m in min_idx
-                for v in rng.integers(some_seeds[m] - 10000, some_seeds[m] + 10000, 1000)
+                for v in rng.integers(
+                    some_seeds[m] - 10000, some_seeds[m] + 10000, 1000
+                )
                 if any(s <= v < e for s, e in range_seeds)
             ]
         )
-        if min_v == globlal_min:
-            same_for_idx += 1
+
+        # Ensure we don't quit looking too early
+        if min_v == old_min:
+            same_min_for_i += 1
         else:
-            same_for_idx = 0
+            same_min_for_i = 0
 
     return min_v
-    # sns.lineplot(x=some_seeds, y=converted)
-    # plt.show()
 
 
 if __name__ == "__main__":
