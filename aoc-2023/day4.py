@@ -27,15 +27,15 @@ def solve(scratchcards: list[tuple[set[int], set[int]]]):
 
 
 def solve_2(scratchcards: list[tuple[set[int], set[int]]]):
-    weights = np.ones(len(scratchcards), dtype=int)
+    counts = np.ones(len(scratchcards), dtype=int)
     for i, (winning, mine) in enumerate(scratchcards):
         n_same = len(winning.intersection(mine))
-        weights[i + 1 : i + n_same + 1] += weights[i]
+        counts[i + 1 : i + 1 + n_same] += counts[i]
 
-    return weights.sum()
+    return counts.sum()
 
 
 if __name__ == "__main__":
     games = parse_input()
-    print(solve(games))
-    print(solve_2(games))
+    print(f"Part one: {solve(games)}")
+    print(f"Part two: {solve_2(games)}")
