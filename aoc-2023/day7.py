@@ -31,6 +31,9 @@ class Card:
             "2": 2,
             "J": 1,
         }
+        if not use_jokers:
+            card_to_v["J"] = 12
+
         self_v = card_to_v[self.val]
         other_v = card_to_v[other.val]
         return self_v < other_v
@@ -118,7 +121,7 @@ class Hand:
             elif check(other):
                 return True
 
-        raise ValueError
+        raise ValueError("No valid sorting found")
 
 
 def parse_input() -> list[tuple[Hand, int]]:
@@ -138,7 +141,7 @@ def parse_input() -> list[tuple[Hand, int]]:
 
 
 def solve(hands_with_bids: list[tuple[Hand, int]]):
-    sorted_hands = list((sorted(hands_with_bids, key=lambda hand_bids: hand_bids[0])))
+    sorted_hands = sorted(hands_with_bids, key=lambda hand_bids: hand_bids[0])
 
     return sum((1 + i) * bid for i, (_, bid) in enumerate(sorted_hands))
 
