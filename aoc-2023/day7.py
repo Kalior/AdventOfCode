@@ -87,17 +87,13 @@ class Hand:
         if no_jokers:
             return True
 
-        for j in range(self.n_jokers + 1):
-            other_j = self.n_jokers - j
-            if any(
-                (v + j) == 3 and (v2 + other_j) == 2
-                for k, v in self.counts
-                for k2, v2 in self.counts
-                if k.val != "J" and k2.val != "J" and k != k2
-            ):
-                return True
-
-        return False
+        return any(
+            (v + j) == 3 and (v2 + (self.n_jokers - j)) == 2
+            for k, v in self.counts
+            for k2, v2 in self.counts
+            for j in range(self.n_jokers + 1)
+            if k.val != "J" and k2.val != "J" and k != k2
+        )
 
     def is_three_of_a_kind(self):
         return any(
@@ -112,16 +108,13 @@ class Hand:
         if no_jokers:
             return True
 
-        for j in range(self.n_jokers + 1):
-            other_j = self.n_jokers - j
-            if any(
-                v + j >= 2 and v_2 + other_j >= 2
-                for k, v in self.counts
-                for k_2, v_2 in self.counts
-                if k_2 != k and k.val != "J" and k_2.val != "J"
-            ):
-                return True
-        return False
+        return any(
+            v + j >= 2 and v_2 + (self.n_jokers - j) >= 2
+            for k, v in self.counts
+            for k_2, v_2 in self.counts
+            for j in range(self.n_jokers + 1)
+            if k_2 != k and k.val != "J" and k_2.val != "J"
+        )
 
     def is_one_pair(self):
         return any(
