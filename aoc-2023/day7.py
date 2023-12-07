@@ -46,14 +46,10 @@ class Hand:
     def from_str(cards: str) -> "Hand":
         return Hand([Card(c) for c in cards])
 
-    @property
+    @functools.cached_property
     def counts(self) -> list[tuple[Card, int]]:
         counts = Counter(self.cards).most_common()
         return counts
-        # if not use_jokers:
-        #     return counts
-        # else:
-        #     return [(k, v) for k, v in counts if k.val != "J"]
 
     @property
     def n_jokers(self):
@@ -93,8 +89,11 @@ class Hand:
 
         for j in range(self.n_jokers + 1):
             other_j = self.n_jokers - j
-            if any((v + j) == 3 for k, v in self.counts if k.val != "J") and any(
-                (v + other_j) == 2 for k, v in self.counts if k.val != "J"
+            if any(
+                (v + j) == 3 and (v2 + other_j) == 2
+                for k, v in self.counts
+                for k2, v2 in self.counts
+                if k.val != "J" and k2.val != "J" and k != k2
             ):
                 return True
 
@@ -115,11 +114,13 @@ class Hand:
 
         for j in range(self.n_jokers + 1):
             other_j = self.n_jokers - j
-            for k, v in self.counts:
-                for k_2, v_2 in self.counts:
-                    if k_2 != k and k.val != "J":
-                        if v + j >= 2 and v_2 + other_j >= 2:
-                            return True
+            if any(
+                v + j >= 2 and v_2 + other_j >= 2
+                for k, v in self.counts
+                for k_2, v_2 in self.counts
+                if k_2 != k and k.val != "J" and k_2.val != "J"
+            ):
+                return True
         return False
 
     def is_one_pair(self):
@@ -139,41 +140,23 @@ class Hand:
                 continue
             return c > o
 
-    def __le__(self, other):
-        return self < other and other == self
-
-    def __ge__(self, other):
-        return other < self and other == self
-
-    def __gt__(self, other):
-        return other < self
-
     def __lt__(self, other):
-        # Five of a kind checks
+        # All of the checks to test
         ordered_checks = [
-            (self.is_five_of_a_kind(), other.is_five_of_a_kind(), "is_five_of_a_kind"),
-            (self.is_four_of_a_kind(), other.is_four_of_a_kind(), "is_four_of_a_kind"),
-            (self.is_full_house(), other.is_full_house(), "is_full_house"),
-            (
-                self.is_three_of_a_kind(),
-                other.is_three_of_a_kind(),
-                "is_three_of_a_kind",
-            ),
-            (self.is_two_pair(), other.is_two_pair(), "is_two_pair"),
-            (self.is_one_pair(), other.is_one_pair(), "is_one_pair"),
-            (self.is_high_card(), other.is_high_card(), "is_high_card"),
+            Hand.is_five_of_a_kind,
+            Hand.is_four_of_a_kind,
+            Hand.is_full_house,
+            Hand.is_three_of_a_kind,
+            Hand.is_two_pair,
+            Hand.is_one_pair,
+            Hand.is_high_card,
         ]
-        for check, other_check, name in ordered_checks:
-            # if name == "is_three_of_a_kind" and other_check and other.n_jokers > 0:
-            #     print(other)
-            # if name == "is_three_of_a_kind" and check and self.n_jokers > 0:
-            #     print(self)
-            # print(f"{check}, {other_check}, {name}")
-            if check and other_check:
+        for check in ordered_checks:
+            if check(self) and check(other):
                 return not self.has_first_higher_card(other)
-            elif check:
+            elif check(self):
                 return False
-            elif other_check:
+            elif check(other):
                 return True
 
         raise ValueError
@@ -197,14 +180,13 @@ def parse_input() -> list[tuple[Hand, int]]:
 
 def solve(hands_with_bids: list[tuple[Hand, int]]):
     sorted_hands = list((sorted(hands_with_bids, key=lambda hand_bids: hand_bids[0])))
-    print("\n".join([f"{h}, {b}" for h, b in sorted_hands if h.n_jokers > 1]))
 
     return sum((1 + i) * bid for i, (_, bid) in enumerate(sorted_hands))
 
 
 if __name__ == "__main__":
     hands = parse_input()
-    #    print(f"Part one: {solve(hands)}")
+    print(f"Part one: {solve(hands)}")
     use_jokers = True
 
     smallest = Hand.from_str("32T3K")
@@ -220,21 +202,28 @@ if __name__ == "__main__":
     assert two_pair.is_two_pair()
     # assert right_two_pair < two_pair
 
-    full_house = Hand.from_str("T55J5")
+    assert Hand.from_str("T55J5").is_three_of_a_kind()
+    assert Hand.from_str("T55J5").is_full_house()
 
-    assert full_house.is_three_of_a_kind()
-    assert full_house.is_full_house()
+    assert Hand.from_str("JJJJJ").is_five_of_a_kind()
 
-    all_jokers = Hand.from_str("JJJJJ")
+    assert Hand.from_str("TJ3JJ").n_jokers == 3
+    assert not Hand.from_str("TJ3JJ").is_five_of_a_kind()
+    assert Hand.from_str("TJ3JJ") < Hand.from_str("JJJJJ")
 
-    assert all_jokers.is_five_of_a_kind()
+    assert Hand.from_str("J2K77").is_three_of_a_kind()
+    assert not Hand.from_str("J2K77").is_four_of_a_kind()
+    assert not Hand.from_str("J2K77").is_five_of_a_kind()
+    assert not Hand.from_str("J2K77").is_full_house()
 
-    not_all_jokers = Hand.from_str("TJ3JJ")
+    assert Hand.from_str("J47JT").is_three_of_a_kind()
+    assert not Hand.from_str("J47JT").is_four_of_a_kind()
+    assert not Hand.from_str("J47JT").is_five_of_a_kind()
+    assert not Hand.from_str("J47JT").is_full_house()
 
-    assert not_all_jokers.n_jokers == 3
-    assert not not_all_jokers.is_five_of_a_kind()
-    assert not_all_jokers < all_jokers
+    assert not Hand.from_str("J2K77").has_first_higher_card(Hand.from_str("J47JT"))
+    assert Hand.from_str("J2K77") < Hand.from_str("J47JT")
 
-    j_k = Hand.from_str("JKKK2")
+    assert Hand.from_str("J47JT") < Hand.from_str("J5859") < Hand.from_str("J5KJ8")
 
     print(f"Part two: {solve(hands)}")
