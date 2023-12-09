@@ -82,6 +82,7 @@ def solve_2(seeds_and_maps: tuple[list[str], list[Map]]):
         # Update smallest as-yet found values
         old_min = min_v
         min_v = min(list(converted) + [old_min])
+
         print(min_v)
 
         # Resample `some_seeds` from around where we found the smallest values

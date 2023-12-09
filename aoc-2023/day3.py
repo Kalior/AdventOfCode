@@ -10,7 +10,7 @@ from more_itertools import split_at
 @dataclass
 class Entry:
     val: str
-    identifier: int = field(default_factory=count().__next__, hash=True)
+    identifier: int = field(default_factory=count().__next__)
 
     def __hash__(self):
         return hash(self.identifier)
@@ -42,7 +42,11 @@ class EngineSchematic:
 
     def parse(lines: str) -> "EngineSchematic":
         def _parse_line(line: str) -> Iterable[tuple[int, Entry]]:
-            splits = split_at(enumerate(line), pred=lambda v: not v[1].isnumeric(), keep_separator=True)
+            splits = split_at(
+                enumerate(line),
+                pred=lambda v: not v[1].isnumeric(),
+                keep_separator=True,
+            )
             for split in splits:
                 value = Entry("".join(v for _, v in split))
                 for x_, _ in split:

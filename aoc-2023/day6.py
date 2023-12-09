@@ -1,6 +1,5 @@
 from pathlib import Path
 import numpy as np
-from dataclasses import dataclass
 
 
 def parse_input() -> list[tuple[int, int]]:
@@ -26,7 +25,17 @@ def winning_times(time: int, distance: int) -> list[int]:
     return velocities[distance_travelled > distance]
 
 
+def all_math_like(time: int, distance: int) -> int:
+    # x^2 - time * x + distance
+    x = - (time / 2) + np.sqrt(np.square(time / 2) - distance)
+    x_far = - (time / 2) - np.sqrt(np.square(time / 2) - distance)
+
+    return np.floor(x_far) - np.floor(x)
+
+
 def solve(record_times: list[tuple[int, int]]):
+    print(np.prod([all_math_like(time, distance) for time, distance in record_times]))
+
     return np.prod(
         [len(winning_times(time, distance)) for time, distance in record_times]
     )

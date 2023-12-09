@@ -3,9 +3,7 @@ import itertools
 
 import math
 import numpy as np
-import numba
-from numba.typed import Dict
-from numba.core import types
+
 
 def parse_input():
     p = Path("inputs") / "day8"
