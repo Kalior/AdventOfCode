@@ -28,12 +28,12 @@ pub fn solve() !void {
         if (line.len == 0) {
             continue;
         }
-        std.debug.print("{s}.\n", .{line});
 
         var it = std.mem.splitSequence(u8, line, "   ");
 
         const left_v = try std.fmt.parseInt(i32, it.next().?, 10);
         try left_list.append(left_v);
+
         const right_v = try std.fmt.parseInt(i32, it.next().?, 10);
         try right_list.append(right_v);
     }
@@ -49,6 +49,7 @@ pub fn solve() !void {
     std.debug.print("Total distance {}.\n", .{total_distance});
 
     var frequencies = std.AutoHashMap(i32, i32).init(allocator);
+    defer frequencies.deinit();
 
     for (right_list.items) |right| {
         const old = frequencies.get(right) orelse 0;
