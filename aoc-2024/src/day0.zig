@@ -11,8 +11,8 @@ fn readFile(allocator: std.mem.Allocator, filename: []const u8) ![]u8 {
     return try file.readToEndAlloc(allocator, stat.size);
 }
 
-fn parse(allocator: std.mem.Allocator, input: []u8) !std.ArrayList(i32) {
-    var lines = std.mem.split(u8, input, "\n");
+fn parse(allocator: std.mem.Allocator, input: []const u8) !std.ArrayList(i32) {
+    var lines = std.mem.splitSequence(u8, input, "\n");
 
     var values = std.ArrayList(i32).init(allocator);
     errdefer values.deinit();
@@ -21,7 +21,7 @@ fn parse(allocator: std.mem.Allocator, input: []u8) !std.ArrayList(i32) {
         if (line.len == 0) {
             continue;
         }
-        const v_parsed = try std.fmt.parseInt(i32, v, 10);
+        const v_parsed = try std.fmt.parseInt(i32, line, 10);
         try values.append(v_parsed);
     }
 

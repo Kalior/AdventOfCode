@@ -105,13 +105,8 @@ fn check_all_repeating(allocator: std.mem.Allocator, start_position: Point, bloc
     const potential_positions = try move_around(allocator, start_position, blocks.*);
 
     var n_repeating: i32 = 0;
-    var checked: i32 = 0;
     var it = potential_positions.keyIterator();
     while (it.next()) |key_ptr| {
-        checked += 1;
-        if (@rem(checked, 1000) == 0) {
-            std.debug.print("checked: {}\n", .{checked});
-        }
         const v = key_ptr.*;
 
         if (!(v.x == start_position.x and v.y == start_position.y) and !blocks.contains(v)) {

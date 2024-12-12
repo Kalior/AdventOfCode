@@ -85,7 +85,7 @@ pub fn solve() !void {
         if (line.len == 0) {
             continue;
         }
-        works += try check(allocator, lineg, false);
+        works += try check(allocator, line, false);
         works_2 += try check(allocator, line, true);
     }
 
